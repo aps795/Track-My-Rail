@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RailTrack</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-train"></i>
+                <span>RailTrack</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="../index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="train-search.html" class="nav-link">Search Trains</a></li>
+                <li class="nav-item"><a href="live-status.html" class="nav-link">Live Status</a></li>
+                <li class="nav-item"><a href="pnr-status.html" class="nav-link">PNR Status</a></li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="login.html" class="nav-link login-btn active">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 70px); background: linear-gradient(135deg, #003da5 0%, #1e5aa8 100%); padding: 20px;">
+        <div style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <i class="fas fa-train" style="font-size: 3rem; color: #003da5; margin-bottom: 15px; display: block;"></i>
+                <h2 style="color: #003da5;">RailTrack</h2>
+                <p style="color: #666; margin-top: 10px;">Login to your account</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="loginEmail" style="color: #003da5; font-weight: 600; margin-bottom: 10px; display: block;">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem; transition: all 0.3s ease;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="loginPassword" style="color: #003da5; font-weight: 600; margin-bottom: 10px; display: block;">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 1rem; transition: all 0.3s ease;">
+                        <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #003da5;"></i>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="rememberMe">
+                        <span style="color: #666; font-size: 0.9rem;">Remember me</span>
+                    </label>
+                    <a href="#" style="color: #f39c12; text-decoration: none; font-size: 0.9rem;">Forgot password?</a>
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 12px 15px; background-color: #003da5; color: white; border: none; border-radius: 5px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 15px;">
+                    Login
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p style="color: #666; font-size: 0.9rem;">Or continue with</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <button style="padding: 10px; border: 2px solid #e0e0e0; background: white; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fab fa-google" style="color: #ea4335;"></i>
+                    <span style="font-size: 0.9rem; color: #666;">Google</span>
+                </button>
+                <button style="padding: 10px; border: 2px solid #e0e0e0; background: white; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fab fa-facebook" style="color: #3b5998;"></i>
+                    <span style="font-size: 0.9rem; color: #666;">Facebook</span>
+                </button>
+            </div>
+
+            <div style="text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                <p style="color: #666; font-size: 0.9rem;">Don't have an account? 
+                    <a href="#" style="color: #f39c12; text-decoration: none; font-weight: 600;">Sign up here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('loginPassword');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!email || !password) {
+                RailTrack.showError('Please fill all fields');
+                return;
+            }
+
+            try {
+                await RailTrack.loginUser(email, password);
+                RailTrack.showSuccess('Login successful!');
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1200);
+            } catch (error) {
+                RailTrack.showError(error.message || 'Login failed');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailTrack - Indian Railway Tracking System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-train"></i>
+                <span>RailTrack</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link active">Home</a></li>
+                <li class="nav-item"><a href="pages/train-search.html" class="nav-link">Search Trains</a></li>
+                <li class="nav-item"><a href="pages/live-status.html" class="nav-link">Live Status</a></li>
+                <li class="nav-item"><a href="pages/pnr-status.html" class="nav-link">PNR Status</a></li>
+                <li class="nav-item"><a href="pages/about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="pages/login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to RailTrack</h1>
+            <p>Your Complete Indian Railway Tracking Solution</p>
+            <button class="cta-button" onclick="window.location.href='pages/train-search.html'">
+                <i class="fas fa-search"></i> Search Now
+            </button>
+        </div>
+        <div class="hero-background">
+            <div class="train-icon-large">
+                <i class="fas fa-train"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>Our Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Search Trains</h3>
+                    <p>Find trains between any two stations with comprehensive details</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3>View Routes</h3>
+                    <p>See complete train routes with all intermediate stations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+                    <h3>Live Status</h3>
+                    <p>Check real-time train running status and current location</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ticket"></i>
+                    </div>
+                    <h3>PNR Status</h3>
+                    <p>Track your booking status using PNR number</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Search History</h3>
+                    <p>Access your previous searches anytime after login</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Real-time Updates</h3>
+                    <p>Get instant notifications for train delays and updates</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Search Section -->
+    <section class="quick-search">
+        <div class="container">
+            <h2>Quick Train Search</h2>
+            <form class="search-form" id="quickSearchForm">
+                <div class="form-group">
+                    <label for="from">From Station</label>
+                    <input type="text" id="from" placeholder="Enter departure station" required>
+                    <ul id="fromSuggestions" class="suggestions-dropdown"></ul>
+                </div>
+                <div class="form-group">
+                    <label for="to">To Station</label>
+                    <input type="text" id="to" placeholder="Enter arrival station" required>
+                    <ul id="toSuggestions" class="suggestions-dropdown"></ul>
+                </div>
+                <div class="form-group">
+                    <label for="date">Journey Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="statistics">
+        <div class="container">
+            <div class="stat-box">
+                <h3>18000+</h3>
+                <p>Trains Tracked</p>
+            </div>
+            <div class="stat-box">
+                <h3>9000+</h3>
+                <p>Stations Covered</p>
+            </div>
+            <div class="stat-box">
+                <h3>50M+</h3>
+                <p>Active Users</p>
+            </div>
+            <div class="stat-box">
+                <h3>99.5%</h3>
+                <p>Uptime</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>RailTrack</h4>
+                    <p>Your trusted partner for Indian Railway information</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="pages/train-search.html">Search Trains</a></li>
+                        <li><a href="pages/live-status.html">Live Status</a></li>
+                        <li><a href="pages/pnr-status.html">PNR Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RailTrack. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
