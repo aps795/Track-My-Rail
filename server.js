@@ -20,49 +20,8 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 10000;
 
-app.get('/', (req, res) => {
-    res.status(200).send('Backend is running and healthy!');
-});
-
-/**
- * Get PNR Status
- * GET /api/pnr/:pnrNumber
- */
-app.get('/api/pnr/:pnrNumber', async (req, res) => {
-    try {
-        const { pnrNumber } = req.params;
-
-        if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
-            try {
-                const data = await fetchFromRapidAPI('/getPNRStatus', { pnrNumber });
-                return res.json({
-                    success: true,
-                    pnr: pnrNumber,
-                    data: data.data || data,
-                    dataSource: 'RAPID_API'
-                });
-            } catch (apiError) {
-                console.error('RapidAPI PNR Error:', apiError.message);
-            }
-        }
-        res.status(404).json({ success: false, message: 'PNR status not found' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
-
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error('SERVER ERROR:', err.stack);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚂 Server is live and listening on 0.0.0.0:${PORT}`);
-});
-
 // ============================================
-// Configuration
+// Configuration (Must be before routes)
 // ============================================
 const RAILWAY_API_OPTIONS = {
     RAPID_API_KEY: process.env.RAPID_API_KEY,
@@ -95,12 +54,41 @@ async function fetchFromRapidAPI(endpoint, params) {
 }
 
 // ============================================
-// API Endpoints
+// Routes
 // ============================================
+
+app.get('/', (req, res) => {
+    res.status(200).send('Backend is running and healthy!');
+});
+
+/**
+ * Get PNR Status
+ */
+app.get('/api/pnr/:pnrNumber', async (req, res) => {
+    try {
+        const { pnrNumber } = req.params;
+
+        if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
+            try {
+                const data = await fetchFromRapidAPI('/getPNRStatus', { pnrNumber });
+                return res.json({
+                    success: true,
+                    pnr: pnrNumber,
+                    data: data.data || data,
+                    dataSource: 'RAPID_API'
+                });
+            } catch (apiError) {
+                console.error('RapidAPI PNR Error:', apiError.message);
+            }
+        }
+        res.status(404).json({ success: false, message: 'PNR status not found' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 /**
  * Search Stations
- * GET /api/stations/search?query=delhi
  */
 app.get('/api/stations/search', async (req, res) => {
     try {
@@ -110,7 +98,6 @@ app.get('/api/stations/search', async (req, res) => {
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
                 const data = await fetchFromRapidAPI('/searchStation', { query });
-                // Map to frontend expectation: { stations: [{ name: '...', code: '...' }] }
                 let stations = [];
                 const rawData = data.data || data || [];
                 if (Array.isArray(rawData)) {
@@ -132,7 +119,6 @@ app.get('/api/stations/search', async (req, res) => {
 
 /**
  * Search Trains Between Two Stations
- * GET /api/trains/search?from=NDLS&to=CSTM&date=2024-01-15
  */
 app.get('/api/trains/search', async (req, res) => {
     try {
@@ -210,12 +196,10 @@ app.get('/api/trains/:trainNo/route', async (req, res) => {
 
 /**
  * Get Live Train Status
- * GET /api/trains/:trainNo/status
  */
 app.get('/api/trains/:trainNo/status', async (req, res) => {
     try {
         const { trainNo } = req.params;
-        const date = new Date().toISOString().split('T')[0]; // Use today's date
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
@@ -236,3 +220,12 @@ app.get('/api/trains/:trainNo/status', async (req, res) => {
     }
 });
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err.stack);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚂 Server is live and listening on 0.0.0.0:${PORT}`);
+});
