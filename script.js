@@ -2,7 +2,10 @@
 // RailTrack - Main JavaScript
 // ============================================
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// UPDATE THIS: Replace with your actual live Render backend URL
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5000/api'
+    : 'https://track-my-rail.onrender.com/api';
 
 // API helper wrapper
 async function apiFetch(path, options = {}) {
