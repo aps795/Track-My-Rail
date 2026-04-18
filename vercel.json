@@ -6,10 +6,6 @@
     {
       "source": "/api/(.*)",
       "destination": "https://track-my-rail.onrender.com/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
     }
   ]
 }
