@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Trains - RailTrack</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="train-search.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-train"></i>
+                <span>RailTrack</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="../index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="train-search.html" class="nav-link active">Search Trains</a></li>
+                <li class="nav-item"><a href="live-status.html" class="nav-link">Live Status</a></li>
+                <li class="nav-item"><a href="pnr-status.html" class="nav-link">PNR Status</a></li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="train-search-main">
+        <section class="search-section">
+            <div class="container">
+                <h1>Search Trains</h1>
+                <p class="subtitle">Find trains between any two stations</p>
+                
+                <!-- Search Form -->
+                <form class="search-form" id="trainSearchForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fromStation">From Station</label>
+                            <input type="text" id="fromStation" placeholder="e.g., Delhi (NDLS)" required>
+                            <ul id="fromStationList" class="suggestions-dropdown"></ul>
+                            <small class="station-code">Station Code: <span id="fromCode">-</span></small>
+                        </div>
+
+                        <div class="form-group swap-btn-group">
+                            <button type="button" id="swapBtn" class="swap-btn" title="Swap stations">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="toStation">To Station</label>
+                            <input type="text" id="toStation" placeholder="e.g., Mumbai (MMCT)" required>
+                            <ul id="toStationList" class="suggestions-dropdown"></ul>
+                            <small class="station-code">Station Code: <span id="toCode">-</span></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="journeyDate">Journey Date</label>
+                            <input type="date" id="journeyDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classType">Class</label>
+                            <select id="classType">
+                                <option value="">All Classes</option>
+                                <option value="1A">First AC (1A)</option>
+                                <option value="2A">Second AC (2A)</option>
+                                <option value="3A">Third AC (3A)</option>
+                                <option value="SL">Sleeper (SL)</option>
+                                <option value="2S">Second Sitting (2S)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section">
+            <div class="container">
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Searching for trains...</p>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="results-container">
+                    <!-- Results will be loaded here -->
+                </div>
+
+                <!-- No Results Message -->
+                <div id="noResults" class="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No trains found</h3>
+                    <p>Try searching with different stations or dates</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>RailTrack</h4>
+                    <p>Your trusted partner for Indian Railway information</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="train-search.html">Search Trains</a></li>
+                        <li><a href="live-status.html">Live Status</a></li>
+                        <li><a href="pnr-status.html">PNR Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RailTrack. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="train-search.js"></script>
+</body>
+</html>
