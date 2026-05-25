@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track My Rail - API Integration Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .response {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .response.show {
+            display: block;
+        }
+        
+        .response.error {
+            border-left-color: #e74c3c;
+            background: #ffe6e6;
+        }
+        
+        .response.success {
+            border-left-color: #27ae60;
+            background: #e8f8f5;
+        }
+        
+        .response h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .response pre {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        
+        .history {
+            margin-top: 30px;
+        }
+        
+        .history h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .history-list {
+            list-style: none;
+        }
+        
+        .history-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .history-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .timestamp {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .success {
+            color: #27ae60;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚂 Track My Rail</h1>
+            <p>Real-time Indian Railway Information</p>
+        </div>
+        
+        <div class="content">
+            <!-- PNR Status Card -->
+            <div class="card">
+                <h2>🎫 Check PNR Status</h2>
+                
+                <div class="form-group">
+                    <label for="apiKey1">API Key</label>
+                    <input type="text" id="apiKey1" placeholder="Enter your Indian Rail API key">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pnrNumber">PNR Number</label>
+                    <input type="text" id="pnrNumber" placeholder="e.g., 1234567890">
+                </div>
+                
+                <button onclick="checkPNRStatus()">Check PNR</button>
+                
+                <div class="loading" id="pnrLoading">
+                    <div class="spinner"></div>
+                    <p>Fetching PNR data...</p>
+                </div>
+                
+                <div class="response" id="pnrResponse">
+                    <h3>PNR Status Response</h3>
+                    <pre id="pnrResponseData"></pre>
+                </div>
+            </div>
+            
+            <!-- Train Status Card -->
+            <div class="card">
+                <h2>🚆 Check Train Status</h2>
+                
+                <div class="form-group">
+                    <label for="apiKey2">API Key</label>
+                    <input type="text" id="apiKey2" placeholder="Enter your Indian Rail API key">
+                </div>
+                
+                <div class="form-group">
+                    <label for="trainNumber">Train Number</label>
+                    <input type="text" id="trainNumber" placeholder="e.g., 12345">
+                </div>
+                
+                <div class="form-group">
+                    <label for="journeyDate">Journey Date</label>
+                    <input type="date" id="journeyDate">
+                </div>
+                
+                <button onclick="checkTrainStatus()">Check Train Status</button>
+                
+                <div class="loading" id="trainLoading">
+                    <div class="spinner"></div>
+                    <p>Fetching train data...</p>
+                </div>
+                
+                <div class="response" id="trainResponse">
+                    <h3>Train Status Response</h3>
+                    <pre id="trainResponseData"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Section -->
+        <div class="card history">
+            <h2>📋 Search History</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">PNR Searches</h3>
+                    <ul class="history-list" id="pnrHistoryList"></ul>
+                    <button onclick="clearPNRHistory()" style="margin-top: 10px; background: #e74c3c;">Clear PNR History</button>
+                </div>
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 10px;">Train Searches</h3>
+                    <ul class="history-list" id="trainHistoryList"></ul>
+                    <button onclick="clearTrainHistory()" style="margin-top: 10px; background: #e74c3c;">Clear Train History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="api-service.js"></script>
+    <script src="data-handler.js"></script>
+    <script>
+        // Set today's date as default
+        document.getElementById('journeyDate').valueAsDate = new Date();
+        
+        /**
+         * Check PNR Status
+         */
+        async function checkPNRStatus() {
+            const apiKey = document.getElementById('apiKey1').value.trim();
+            const pnrNumber = document.getElementById('pnrNumber').value.trim();
+            
+            if (!apiKey || !pnrNumber) {
+                showPNRResponse('Please enter both API key and PNR number', true);
+                return;
+            }
+            
+            showPNRLoading(true);
+            
+            try {
+                // Check cache first
+                let data = getCachedPNRResponse(pnrNumber);
+                
+                if (!data) {
+                    // Fetch from API
+                    data = await getPNRStatus(apiKey, pnrNumber);
+                    
+                    // Parse the response
+                    const parsedData = parsePNRData(data);
+                    
+                    // Cache the response
+                    cachePNRResponse(pnrNumber, parsedData);
+                    
+                    // Add to history
+                    addPNRToHistory(parsedData);
+                }
+                
+                showPNRResponse(JSON.stringify(data, null, 2), false);
+                updateHistoryDisplay();
+            } catch (error) {
+                showPNRResponse(`Error: ${error.message}`, true);
+            } finally {
+                showPNRLoading(false);
+            }
+        }
+        
+        /**
+         * Check Train Status
+         */
+        async function checkTrainStatus() {
+            const apiKey = document.getElementById('apiKey2').value.trim();
+            const trainNumber = document.getElementById('trainNumber').value.trim();
+            const journeyDate = document.getElementById('journeyDate').value;
+            
+            if (!apiKey || !trainNumber || !journeyDate) {
+                showTrainResponse('Please enter API key, train number, and journey date', true);
+                return;
+            }
+            
+            const formattedDate = formatDateForAPI(new Date(journeyDate));
+            showTrainLoading(true);
+            
+            try {
+                // Check cache first
+                let data = getCachedTrainStatusResponse(trainNumber, formattedDate);
+                
+                if (!data) {
+                    // Fetch from API
+                    data = await getLiveTrainStatus(apiKey, trainNumber, formattedDate);
+                    
+                    // Parse the response
+                    const parsedData = parseTrainStatusData(data);
+                    
+                    // Cache the response
+                    cacheTrainStatusResponse(trainNumber, formattedDate, parsedData);
+                    
+                    // Add to history
+                    addTrainToHistory(parsedData);
+                }
+                
+                showTrainResponse(JSON.stringify(data, null, 2), false);
+                updateHistoryDisplay();
+            } catch (error) {
+                showTrainResponse(`Error: ${error.message}`, true);
+            } finally {
+                showTrainLoading(false);
+            }
+        }
+        
+        /**
+         * UI Helper Functions
+         */
+        function showPNRLoading(show) {
+            document.getElementById('pnrLoading').style.display = show ? 'block' : 'none';
+        }
+        
+        function showPNRResponse(message, isError) {
+            const responseEl = document.getElementById('pnrResponse');
+            const dataEl = document.getElementById('pnrResponseData');
+            dataEl.textContent = message;
+            responseEl.className = `response show ${isError ? 'error' : 'success'}`;
+        }
+        
+        function showTrainLoading(show) {
+            document.getElementById('trainLoading').style.display = show ? 'block' : 'none';
+        }
+        
+        function showTrainResponse(message, isError) {
+            const responseEl = document.getElementById('trainResponse');
+            const dataEl = document.getElementById('trainResponseData');
+            dataEl.textContent = message;
+            responseEl.className = `response show ${isError ? 'error' : 'success'}`;
+        }
+        
+        /**
+         * Update History Display
+         */
+        function updateHistoryDisplay() {
+            const pnrHistory = getPNRHistory();
+            const trainHistory = getTrainHistory();
+            
+            const pnrList = document.getElementById('pnrHistoryList');
+            const trainList = document.getElementById('trainHistoryList');
+            
+            pnrList.innerHTML = pnrHistory.map((item, index) => `
+                <li class="history-item" onclick="loadPNRFromHistory(${index})">
+                    <strong>PNR: ${item.pnrNumber}</strong><br>
+                    ${item.trainName} - ${item.reservationStatus}
+                    <div class="timestamp">${new Date(item.timestamp).toLocaleString()}</div>
+                </li>
+            `).join('');
+            
+            trainList.innerHTML = trainHistory.map((item, index) => `
+                <li class="history-item" onclick="loadTrainFromHistory(${index})">
+                    <strong>${item.trainNumber}: ${item.trainName}</strong><br>
+                    ${item.stationName} - ${item.status}
+                    <div class="timestamp">${new Date(item.timestamp).toLocaleString()}</div>
+                </li>
+            `).join('');
+        }
+        
+        function loadPNRFromHistory(index) {
+            const history = getPNRHistory();
+            if (history[index]) {
+                showPNRResponse(JSON.stringify(history[index].fullData, null, 2), false);
+            }
+        }
+        
+        function loadTrainFromHistory(index) {
+            const history = getTrainHistory();
+            if (history[index]) {
+                showTrainResponse(JSON.stringify(history[index].fullData, null, 2), false);
+            }
+        }
+        
+        function clearPNRHistory() {
+            if (confirm('Are you sure you want to clear PNR history?')) {
+                clearAllHistory();
+                updateHistoryDisplay();
+            }
+        }
+        
+        function clearTrainHistory() {
+            if (confirm('Are you sure you want to clear Train history?')) {
+                clearAllHistory();
+                updateHistoryDisplay();
+            }
+        }
+        
+        // Initialize history display on page load
+        window.addEventListener('load', updateHistoryDisplay);
+    </script>
+</body>
+</html>
