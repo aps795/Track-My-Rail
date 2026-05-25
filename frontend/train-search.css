@@ -1,0 +1,608 @@
+/* ============================================
+   Train Search Page Styles
+   ============================================ */
+
+.train-search-main {
+    min-height: 100vh;
+    background-color: var(--light-gray);
+}
+
+.search-section {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    padding: 60px 20px;
+    color: var(--white);
+}
+
+.search-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.search-section .subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+
+/* ============================================
+   Search Form
+   ============================================ */
+
+.search-form {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark-gray);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--white);
+    color: var(--dark-gray);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 10px rgba(243, 156, 18, 0.2);
+    background-color: #fffbf7;
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.station-code {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.swap-btn-group {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.swap-btn {
+    background-color: var(--accent-orange);
+    color: var(--dark-gray);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.swap-btn:hover {
+    background-color: var(--light-orange);
+    transform: rotate(180deg) scale(1.1);
+}
+
+.search-btn {
+    background-color: var(--accent-orange);
+    color: var(--dark-gray);
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 45px;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.search-btn:hover {
+    background-color: var(--light-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(243, 156, 18, 0.4);
+}
+
+.search-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Suggestions Dropdown
+   ============================================ */
+
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    list-style: none;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    z-index: 100;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: -2px;
+}
+
+.suggestions-dropdown.show {
+    display: block;
+}
+
+.suggestions-dropdown li {
+    padding: 12px 15px;
+    color: var(--dark-gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.suggestions-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.suggestions-dropdown li:hover {
+    background-color: var(--light-gray);
+    color: var(--accent-orange);
+    padding-left: 20px;
+}
+
+/* ============================================
+   Error Message
+   ============================================ */
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    border-left: 5px solid var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-message i {
+    font-size: 1.2rem;
+}
+
+/* ============================================
+   Results Section
+   ============================================ */
+
+.results-section {
+    padding: 40px 20px;
+    background-color: var(--light-gray);
+}
+
+.results-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Train Result Card
+   ============================================ */
+
+.train-result {
+    background-color: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 30px;
+    padding: 20px;
+    align-items: center;
+    border-left: 5px solid var(--accent-orange);
+}
+
+.train-result:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.train-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.train-icon {
+    font-size: 2rem;
+    color: var(--accent-orange);
+}
+
+.train-info h3 {
+    color: var(--primary-blue);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.train-info p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   Journey Details
+   ============================================ */
+
+.journey-details {
+    display: grid;
+    gap: 15px;
+}
+
+.time-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.time-block {
+    text-align: center;
+}
+
+.time-block .time {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary-blue);
+    display: block;
+}
+
+.time-block .period {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.time-block .station-name {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.duration {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.duration strong {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+.route-line {
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-orange) 0%, transparent 100%);
+    flex: 1;
+}
+
+/* ============================================
+   Availability & Price
+   ============================================ */
+
+.availability {
+    display: grid;
+    gap: 10px;
+}
+
+.class-availability {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background-color: var(--light-gray);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.class-name {
+    font-weight: 600;
+    color: var(--dark-gray);
+    width: 60px;
+}
+
+.class-seats {
+    flex: 1;
+    text-align: center;
+    color: #666;
+}
+
+.class-price {
+    font-weight: 600;
+    color: var(--accent-orange);
+    text-align: right;
+    width: 80px;
+}
+
+.available {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.waitlist {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.unavailable {
+    color: #ccc;
+    font-weight: 600;
+}
+
+/* ============================================
+   Book Button
+   ============================================ */
+
+.book-btn {
+    background: linear-gradient(135deg, var(--accent-orange) 0%, var(--light-orange) 100%);
+    color: var(--dark-gray);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.book-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(243, 156, 18, 0.4);
+}
+
+.book-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Loading & Empty States
+   ============================================ */
+
+.loading {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-orange);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading p {
+    color: #666;
+    font-size: 1.1rem;
+    margin-top: 15px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--white);
+    border-radius: 10px;
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: var(--border-color);
+    margin-bottom: 15px;
+}
+
+.no-results h3 {
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media screen and (max-width: 1024px) {
+    .train-result {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .search-section {
+        padding: 40px 20px;
+    }
+
+    .search-section h1 {
+        font-size: 1.8rem;
+    }
+
+    .search-form {
+        padding: 25px 15px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .swap-btn-group {
+        display: none;
+    }
+
+    .train-result {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .journey-details {
+        order: 2;
+    }
+
+    .availability {
+        order: 3;
+    }
+
+    .book-btn {
+        order: 4;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .time-row {
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .route-line {
+        display: none;
+    }
+
+    .time-block {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .search-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .search-form {
+        padding: 20px 10px;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 16px;
+    }
+
+    .train-result {
+        padding: 12px;
+    }
+
+    .train-header {
+        flex-wrap: wrap;
+    }
+
+    .train-info h3 {
+        font-size: 1rem;
+    }
+
+    .class-availability {
+        flex-direction: column;
+        gap: 8px;
+        text-align: left;
+    }
+
+    .class-name,
+    .class-seats,
+    .class-price {
+        width: 100%;
+        text-align: left;
+    }
+
+    .book-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+.suggestions-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-track {
+    background: var(--light-gray);
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+    background: var(--accent-orange);
+    border-radius: 3px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--light-orange);
+}
