@@ -241,9 +241,9 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container" style="padding: 120px 20px 100px;">
         
-        <div class="layout-grid">
+        <div class="layout-grid" id="layoutGrid">
             <!-- Left Column: Search & Timeline -->
             <div class="left-col">
                 <div class="glass-panel search-panel">
@@ -386,39 +386,31 @@
                 let statusData = await RailTrack.fetchTrainStatus(trainNumber);
 
                 // Fallback mock data if API limits reached
-                if (!statusData || !statusData.success) {
-                    statusData = generateMockData(trainNumber);
+                if (!statusData || !statusData.success || statusData.dataSource === 'MOCK_DATA') {
+                    throw new Error('API_LIMIT_EXCEEDED');
                 }
 
                 renderDashboard(statusData);
 
             } catch (error) {
                 console.error(error);
-                renderDashboard(generateMockData(trainNumber));
-            } finally {
                 document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('layoutGrid').innerHTML = `
+                    <div class="empty-state glass-panel" style="grid-column: 1/-1;">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: var(--accent-secondary)"></i></div>
+                        <h3>Service Unavailable</h3>
+                        <p>The IRCTC API rate limit has been exceeded or the service is down.</p>
+                        <button class="btn-primary" onclick="window.history.back()" style="margin-top:20px;">Go Back</button>
+                    </div>
+                `;
+            } finally {
+                if (document.getElementById('loadingState')) {
+                    document.getElementById('loadingState').style.display = 'none';
+                }
             }
         }
 
-        function generateMockData(trainNo) {
-            return {
-                trainNumber: trainNo,
-                trainName: 'Rajdhani Express',
-                runningStatus: 'Departed from Gwalior',
-                currentLocation: 'Gwalior Junction',
-                currentDelay: 'On Time',
-                route: [
-                    { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed', distance: '0' },
-                    { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed', distance: '195' },
-                    { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current', distance: '313' },
-                    { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending', distance: '410' },
-                    { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending', distance: '702' },
-                    { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending', distance: '1384' }
-                ]
-            };
-        }
 
-        function renderDashboard(data) {
             document.getElementById('timelineContainer').style.display = 'block';
             document.getElementById('progressContainer').style.display = 'block';
             document.getElementById('mapContainer').style.display = 'block';
