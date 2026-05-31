@@ -101,17 +101,16 @@ async function fetchTrains(from, to, date, classType = '') {
                 return response.data.trains;
             } else {
                 console.warn('API returned success but no trains found for this route');
+                return [];
             }
         } else {
             console.error('API Search Error:', response.data?.message || 'Unknown error');
+            return [];
         }
     } catch (err) {
         console.error('Failed to connect to backend:', err.message);
+        return [];
     }
-    
-    // Fallback to high-quality mock data so the app doesn't look empty
-    console.log('Using high-quality mock data fallback');
-    return getMockTrains(from, to, date);
 }
 
 async function fetchTrainStatus(trainNumber) {
@@ -384,62 +383,37 @@ function clearLocalStorage(key) {
     localStorage.removeItem(key);
 }
 
-// Robust Mock Stations Database
-const mockStations = [
-    { code: 'NDLS', name: 'New Delhi' },
-    { code: 'DLI', name: 'Delhi Junction' },
-    { code: 'DEC', name: 'Delhi Cantt' },
-    { code: 'MMCT', name: 'Mumbai Central' },
-    { code: 'CSMT', name: 'Mumbai CSMT' },
-    { code: 'LTT', name: 'Lokmanya Tilak Terminus' },
-    { code: 'BCT', name: 'Mumbai Beach' },
-    { code: 'BLR', name: 'Bangalore' },
-    { code: 'SBC', name: 'KSR Bengaluru' },
-    { code: 'CHE', name: 'Chennai Central' },
-    { code: 'MAS', name: 'MGR Chennai Central' },
-    { code: 'CCT', name: 'Cochin' },
-    { code: 'HWH', name: 'Howrah' },
-    { code: 'AGC', name: 'Agra Cantt' },
-    { code: 'GWL', name: 'Gwalior' },
-    { code: 'JYP', name: 'Jaipur' },
-    { code: 'LKO', name: 'Lucknow' },
-    { code: 'KOL', name: 'Kolkata' },
-    { code: 'ASR', name: 'Amritsar' },
-    { code: 'AMB', name: 'Ambala' },
-    { code: 'CNB', name: 'Kanpur Central' },
-    { code: 'BPL', name: 'Bhopal' },
-    { code: 'IDW', name: 'Indore' },
-    { code: 'JSM', name: 'Jamshedpur' }
-];
-
-// Robust Mock Trains Master Database
-const mockTrainsMaster = [
-    { trainNumber: '12951', trainName: 'Rajdhani Express', from: 'New Delhi', to: 'Mumbai Central', departureTime: '16:25', arrivalTime: '08:15', duration: '15h 50m', classes: ['1A', '2A', '3A'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' },
-    { trainNumber: '12953', trainName: 'August Kranti Rajdhani', from: 'Mumbai Central', to: 'Hazrat Nizamuddin', departureTime: '17:10', arrivalTime: '09:43', duration: '16h 33m', classes: ['1A', '2A', '3A'], status: 'Delayed', days: 'Mon Tue Wed Thu Fri Sat Sun' },
-    { trainNumber: '12431', trainName: 'Trivandrum Rajdhani', from: 'Trivandrum Central', to: 'Hazrat Nizamuddin', departureTime: '19:15', arrivalTime: '12:40', duration: '41h 25m', classes: ['1A', '2A', '3A'], status: 'On Time', days: 'Tue Thu Fri' },
-    { trainNumber: '12925', trainName: 'Paschim Express', from: 'Bandra Terminus', to: 'Amritsar', departureTime: '11:25', arrivalTime: '19:20', duration: '31h 55m', classes: ['1A', '2A', '3A', 'SL'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' },
-    { trainNumber: '12004', trainName: 'Shatabdi Express', from: 'New Delhi', to: 'Lucknow', departureTime: '06:10', arrivalTime: '12:40', duration: '6h 30m', classes: ['EC', 'CC'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' }
-];
-
-function fuzzySearchTrains(query) {
+// Async Live Search Functions
+async function fuzzySearchTrains(query) {
     query = query.toLowerCase().trim();
-    if (!query) return [];
-    return mockTrainsMaster.filter(t => 
-        t.trainNumber.includes(query) || t.trainName.toLowerCase().includes(query)
-    ).slice(0, 5); // top 5 suggestions
+    if (!query || query.length < 2) return [];
+    
+    try {
+        const response = await apiFetch(`/trains/autocomplete?query=${encodeURIComponent(query)}`);
+        if (response.ok && response.data?.success) {
+            return response.data.trains || [];
+        }
+        return [];
+    } catch (err) {
+        console.error('Train autocomplete error:', err);
+        return [];
+    }
 }
 
-function fuzzySearchStations(query) {
+async function fuzzySearchStations(query) {
     query = query.toLowerCase().trim();
-    if (!query) return [];
-    return mockStations.filter(s => 
-        s.code.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)
-    ).slice(0, 5);
-}
-
-// Get Mock Trains (Fallback)
-function getMockTrains(from, to, date) {
-    return mockTrainsMaster;
+    if (!query || query.length < 2) return [];
+    
+    try {
+        const response = await apiFetch(`/stations/search?query=${encodeURIComponent(query)}`);
+        if (response.ok && response.data?.success) {
+            return response.data.stations || [];
+        }
+        return [];
+    } catch (err) {
+        console.error('Station autocomplete error:', err);
+        return [];
+    }
 }
 
 // Export functions for use in other pages
@@ -466,9 +440,6 @@ window.RailTrack = {
     saveToLocalStorage,
     getFromLocalStorage,
     clearLocalStorage,
-    mockStations,
-    mockTrainsMaster,
-    getMockTrains,
     fuzzySearchTrains,
     fuzzySearchStations
 };

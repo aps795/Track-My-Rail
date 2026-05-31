@@ -344,19 +344,39 @@
                 dateInput.value = new Date().toISOString().split('T')[0];
             }
 
+            // Debounce Helper
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
+            }
+
             // Track Train Autocomplete
             const trackInput = document.getElementById('trackInput');
             const trackDropdown = document.getElementById('trackDropdown');
             let trackActiveIndex = -1;
 
-            trackInput.addEventListener('input', (e) => {
+            trackInput.addEventListener('input', debounce(async (e) => {
                 const val = e.target.value;
-                const results = window.RailTrack.fuzzySearchTrains(val);
+                if (!val || val.length < 2) {
+                    trackDropdown.innerHTML = '';
+                    trackDropdown.style.display = 'none';
+                    return;
+                }
+
+                // Show loading state
+                trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                trackDropdown.style.display = 'block';
+
+                const results = await window.RailTrack.fuzzySearchTrains(val);
                 trackDropdown.innerHTML = '';
                 trackActiveIndex = -1;
 
                 if (results.length > 0) {
-                    trackDropdown.style.display = 'block';
                     results.forEach((t, i) => {
                         const div = document.createElement('div');
                         div.className = 'ac-item';
@@ -365,28 +385,35 @@
                             <div class="ac-secondary"><i class="fas fa-route"></i> ${t.from} &rarr; ${t.to}</div>
                         `;
                         div.addEventListener('click', () => {
-                            // Immediately track train (redirect to live status with params)
                             window.location.href = `pages/live-status.html?train=${t.trainNumber}`;
                         });
                         trackDropdown.appendChild(div);
                     });
                 } else {
-                    trackDropdown.style.display = 'none';
+                    trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No trains found</div>';
                 }
-            });
+            }, 300));
 
             // Station Autocomplete logic
             function setupStationAutocomplete(inputId, dropdownId) {
                 const input = document.getElementById(inputId);
                 const dropdown = document.getElementById(dropdownId);
                 
-                input.addEventListener('input', (e) => {
+                input.addEventListener('input', debounce(async (e) => {
                     const val = e.target.value;
-                    const results = window.RailTrack.fuzzySearchStations(val);
+                    if (!val || val.length < 2) {
+                        dropdown.innerHTML = '';
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    dropdown.style.display = 'block';
+
+                    const results = await window.RailTrack.fuzzySearchStations(val);
                     dropdown.innerHTML = '';
 
                     if (results.length > 0) {
-                        dropdown.style.display = 'block';
                         results.forEach((s) => {
                             const div = document.createElement('div');
                             div.className = 'ac-item';
@@ -400,9 +427,9 @@
                             dropdown.appendChild(div);
                         });
                     } else {
-                        dropdown.style.display = 'none';
+                        dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
                     }
-                });
+                }, 300));
 
                 // Hide on blur
                 document.addEventListener('click', (e) => {

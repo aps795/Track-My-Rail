@@ -291,6 +291,17 @@
     <script>
         let currentTrains = [];
 
+        // Debounce Helper
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('journeyDate');
             const today = new Date().toISOString().split('T')[0];
@@ -332,13 +343,21 @@
             const input = document.getElementById(inputId);
             const dropdown = document.getElementById(dropdownId);
             
-            input.addEventListener('input', (e) => {
+            input.addEventListener('input', debounce(async (e) => {
                 const val = e.target.value;
-                const results = window.RailTrack.fuzzySearchStations(val);
+                if (!val || val.length < 2) {
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                dropdown.style.display = 'block';
+
+                const results = await window.RailTrack.fuzzySearchStations(val);
                 dropdown.innerHTML = '';
 
                 if (results.length > 0) {
-                    dropdown.style.display = 'block';
                     results.forEach((s) => {
                         const div = document.createElement('div');
                         div.className = 'ac-item';
@@ -350,9 +369,9 @@
                         dropdown.appendChild(div);
                     });
                 } else {
-                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
                 }
-            });
+            }, 300));
             document.addEventListener('click', (e) => {
                 if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
             });
@@ -366,13 +385,13 @@
             try {
                 let data = await RailTrack.searchTrains(from, to, date);
                 if (!data || !data.success || !data.trains || data.trains.length === 0) {
-                    // Generate Mock trains if API exhausted
-                    currentTrains = RailTrack.getMockTrains(from, to, date);
+                    currentTrains = [];
                 } else {
                     currentTrains = data.trains;
                 }
             } catch (err) {
-                currentTrains = RailTrack.getMockTrains(from, to, date);
+                console.error("Search failed:", err);
+                currentTrains = [];
             } finally {
                 document.getElementById('loadingState').style.display = 'none';
                 const sortPref = document.getElementById('sortDropdown').value;

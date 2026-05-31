@@ -118,6 +118,38 @@ app.get('/api/stations/search', async (req, res) => {
 });
 
 /**
+ * Train Autocomplete
+ */
+app.get('/api/trains/autocomplete', async (req, res) => {
+    try {
+        const { query } = req.query;
+        if (!query) return res.status(400).json({ success: false, message: 'Missing query' });
+
+        if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
+            try {
+                const data = await fetchFromRapidAPI('/api/v1/searchTrain', { query });
+                let trains = [];
+                const rawData = data.data || data || [];
+                if (Array.isArray(rawData)) {
+                    trains = rawData.map(t => ({
+                        trainNumber: t.train_number || t.trainNumber,
+                        trainName: t.train_name || t.trainName || t.eng_train_name,
+                        from: t.src_stn_name || t.source || 'Unknown',
+                        to: t.dstn_stn_name || t.destination || 'Unknown'
+                    }));
+                }
+                return res.json({ success: true, trains, dataSource: 'RAPID_API' });
+            } catch (apiError) {
+                console.error('RapidAPI Train Autocomplete Error:', apiError.message);
+            }
+        }
+        res.json({ success: true, trains: [], dataSource: 'MOCK_DATA' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
  * Search Trains Between Two Stations
  */
 app.get('/api/trains/search', async (req, res) => {
