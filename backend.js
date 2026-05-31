@@ -25,8 +25,8 @@ const PORT = process.env.PORT || 10000;
 // ============================================
 const RAILWAY_API_OPTIONS = {
     RAPID_API_KEY: process.env.RAPID_API_KEY,
-    RAPID_API_HOST: process.env.RAPID_API_HOST || 'irctc-indian-railway-pnr-status.p.rapidapi.com',
-    RAPID_TRAIN_API_URL: 'https://irctc-indian-railway-pnr-status.p.rapidapi.com',
+    RAPID_API_HOST: process.env.RAPID_API_HOST || 'irctc1.p.rapidapi.com',
+    RAPID_TRAIN_API_URL: 'https://irctc1.p.rapidapi.com',
     API_SOURCE: process.env.RAPID_API_KEY ? 'RAPID_API' : 'MOCK_DATA'
 };
 
@@ -70,7 +70,7 @@ app.get('/api/pnr/:pnrNumber', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/getPNRStatus', { pnrNumber });
+                const data = await fetchFromRapidAPI('/api/v3/getPNRStatus', { pnrNumber });
                 return res.json({
                     success: true,
                     pnr: pnrNumber,
@@ -97,7 +97,7 @@ app.get('/api/stations/search', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/searchStation', { query });
+                const data = await fetchFromRapidAPI('/api/v3/searchStation', { query });
                 let stations = [];
                 const rawData = data.data || data || [];
                 if (Array.isArray(rawData)) {
@@ -130,7 +130,7 @@ app.get('/api/trains/search', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/getTrainBetweenStations', { 
+                const data = await fetchFromRapidAPI('/api/v3/getTrainBetweenStations', { 
                     fromStationCode: from, 
                     toStationCode: to, 
                     dateOfJourney: date 
@@ -177,7 +177,7 @@ app.get('/api/trains/:trainNo/route', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/getTrainSchedule', { trainNo });
+                const data = await fetchFromRapidAPI('/api/v3/getTrainSchedule', { trainNo });
                 return res.json({
                     success: true,
                     trainNo,
@@ -203,7 +203,7 @@ app.get('/api/trains/:trainNo/status', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/getLiveTrainStatus', { trainNo, startDay: '0' });
+                const data = await fetchFromRapidAPI('/api/v3/getLiveTrainStatus', { trainNo, startDay: '0' });
                 return res.json({
                     success: true,
                     trainNo,
