@@ -7,14 +7,14 @@
       "source": "/api/(.*)",
       "destination": "https://track-my-rail.onrender.com/api/$1"
     },
-    { "source": "/track-train", "destination": "/index.html" },
-    { "source": "/train-status", "destination": "/pages/live-status.html" },
-    { "source": "/route", "destination": "/pages/train-details.html" },
-    { "source": "/between-stations", "destination": "/pages/train-search.html" },
-    { "source": "/pnr", "destination": "/pages/pnr-status.html" },
-    { "source": "/seat-availability", "destination": "/pages/seat-availability.html" },
-    { "source": "/fare-enquiry", "destination": "/pages/fare-enquiry.html" },
-    { "source": "/train-details", "destination": "/pages/train-details.html" },
-    { "source": "/coach-position", "destination": "/pages/coach-position.html" }
+    { "source": "/track-train", "destination": "/track-train.html" },
+    { "source": "/train-status", "destination": "/train-status.html" },
+    { "source": "/route", "destination": "/route.html" },
+    { "source": "/between-stations", "destination": "/between-stations.html" },
+    { "source": "/pnr", "destination": "/pnr.html" },
+    { "source": "/seat-availability", "destination": "/seat-availability.html" },
+    { "source": "/fare-enquiry", "destination": "/fare-enquiry.html" },
+    { "source": "/train-details", "destination": "/train-details.html" },
+    { "source": "/coach-position", "destination": "/coach-position.html" }
   ]
 }

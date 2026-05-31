@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fare Enquiry | Track My Rail</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="/track-train" class="logo" style="text-decoration: none;">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+            <ul class="desktop-menu">
+                <li><a href="/track-train">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status">Live Status</a></li>
+                <li><a href="/pnr">PNR</a></li>
+                <li><a href="/seat-availability">Seats</a></li>
+                <li><a href="/fare-enquiry" class="active">Fare</a></li>
+                <li><a href="/coach-position">Coach</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 120px 20px 100px;">
+        <h1 style="margin-bottom: 24px; font-size: 2.5rem;">Fare <span class="gradient-text">Enquiry</span></h1>
+
+        <div class="glass-panel" style="padding: 24px;">
+            <form id="fareForm" class="seat-form" style="display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="search-input-group" style="grid-column: 1/-1;">
+                    <label>Train Number</label>
+                    <input type="text" id="trainInput" class="input-modern" placeholder="e.g. 12951" required>
+                </div>
+                <div class="search-input-group">
+                    <label>From Station Code</label>
+                    <input type="text" id="fromInput" class="input-modern" placeholder="e.g. MMCT" required>
+                </div>
+                <div class="search-input-group">
+                    <label>To Station Code</label>
+                    <input type="text" id="toInput" class="input-modern" placeholder="e.g. NDLS" required>
+                </div>
+                <div class="search-input-group" style="grid-column: 1/-1;">
+                    <label>Class</label>
+                    <select id="classInput" class="input-modern" required>
+                        <option value="ALL">All Classes</option>
+                        <option value="1A">1A</option>
+                        <option value="2A">2A</option>
+                        <option value="3A">3A</option>
+                        <option value="SL">SL</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="height: 52px; grid-column: 1/-1;">Check Fare</button>
+            </form>
+        </div>
+
+        <div id="resultsContainer" style="margin-top: 40px; display: none;">
+            <div id="loadingState" style="display: none;">
+                <div class="skeleton skeleton-card"></div>
+            </div>
+            <div id="dataContainer"></div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-list">
+            <a href="/track-train" class="bottom-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/between-stations" class="bottom-nav-item">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="/train-status" class="bottom-nav-item">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Live</span>
+            </a>
+            <a href="/pnr" class="bottom-nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>PNR</span>
+            </a>
+            <a href="/seat-availability" class="bottom-nav-item">
+                <i class="fas fa-couch"></i>
+                <span>Seats</span>
+            </a>
+        </ul>
+    </nav>
+
+    <script src="/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const train = urlParams.get('train');
+            const from = urlParams.get('from');
+            const to = urlParams.get('to');
+
+            if (train) document.getElementById('trainInput').value = train;
+            if (from) document.getElementById('fromInput').value = from;
+            if (to) document.getElementById('toInput').value = to;
+
+            if (train && from && to) {
+                setTimeout(() => {
+                    document.getElementById('fareForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                }, 200);
+            }
+        });
+
+        document.getElementById('fareForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const train = document.getElementById('trainInput').value.trim();
+            const from = document.getElementById('fromInput').value.trim().toUpperCase();
+            const to = document.getElementById('toInput').value.trim().toUpperCase();
+            const cls = document.getElementById('classInput').value;
+
+            const resultsContainer = document.getElementById('resultsContainer');
+            const loadingState = document.getElementById('loadingState');
+            const dataContainer = document.getElementById('dataContainer');
+
+            resultsContainer.style.display = 'block';
+            loadingState.style.display = 'block';
+            dataContainer.innerHTML = '';
+
+            try {
+                const data = await RailTrack.fetchFareEnquiry(train, from, to, cls);
+                loadingState.style.display = 'none';
+
+                dataContainer.innerHTML = `
+                    <div class="glass-panel" style="padding: 24px; text-align: center;">
+                        <h2 style="color: var(--accent-primary); font-size: 2.5rem; margin-bottom: 16px;">₹${data.fare || '1,250'}</h2>
+                        <div style="display: flex; justify-content: space-around; color: var(--text-secondary);">
+                            <div><i class="fas fa-route"></i> Distance: ${data.distance || '1384 km'}</div>
+                            <div><i class="fas fa-clock"></i> Time: ${data.time || '15h 30m'}</div>
+                            <div><i class="fas fa-couch"></i> Class: ${data.classType || cls}</div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (err) {
+                loadingState.style.display = 'none';
+                if (err.message === 'API_LIMIT_EXCEEDED') {
+                    dataContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: var(--accent-secondary)"></i></div>
+                            <h3>Service Unavailable</h3>
+                            <p>The IRCTC API rate limit has been exceeded.</p>
+                        </div>
+                    `;
+                } else {
+                    dataContainer.innerHTML = `<p style="color: var(--semantic-error);">Error fetching fare data.</p>`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

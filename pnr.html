@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PNR Status | Track My Rail</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pnr-hero {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+
+        .pnr-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .pnr-search-box {
+            display: flex;
+            background: var(--bg-level-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: var(--glass-shadow);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .pnr-search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .pnr-search-box input:focus {
+            outline: none;
+        }
+
+        .pnr-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .passenger-card {
+            padding: 24px;
+            border-left: 4px solid var(--accent-secondary);
+        }
+        
+        .p-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 12px;
+        }
+
+        .p-info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .p-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .p-val {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .pnr-search-box {
+                flex-direction: column;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                gap: 12px;
+            }
+            .pnr-search-box input {
+                background: var(--bg-level-2);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+            }
+        }
+
+        .loading-skeleton {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="/track-train" class="logo">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+            <ul class="desktop-menu">
+                <li><a href="/track-train">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status">Live Status</a></li>
+                <li><a href="/pnr" class="active">PNR</a></li>
+                <li><a href="/seat-availability">Seats</a></li>
+                <li><a href="/fare-enquiry">Fare</a></li>
+                <li><a href="/coach-position">Coach</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 120px 20px 100px;">
+        
+        <div class="pnr-hero">
+            <h1><span class="gradient-text">PNR</span> Status</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 40px;">Enter your 10-digit PNR number to check current booking status.</p>
+            
+            <form id="pnrForm" class="pnr-search-box">
+                <input type="text" id="pnrInput" placeholder="Enter 10-digit PNR" required pattern="[0-9]{10}" autocomplete="off">
+                <button type="submit" class="btn-primary">Check Status</button>
+            </form>
+        </div>
+
+        <div id="loadingState" class="loading-skeleton glass-panel">
+            <div style="font-size: 2rem; color: var(--accent-secondary); animation: float 2s ease-in-out infinite;"><i class="fas fa-ticket-alt"></i></div>
+            <p style="margin-top: 16px; color: var(--text-secondary);">Retrieving booking details...</p>
+        </div>
+
+        <div id="pnrResults" style="display: none;">
+            
+            <div class="glass-panel" style="padding: 32px; margin-bottom: 24px; text-align: center;">
+                <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">PNR Number</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-primary); letter-spacing: 4px; margin-bottom: 24px;" id="resPnr"></div>
+                
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; color: var(--text-secondary);">
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase;">Train</div>
+                        <strong style="color: var(--text-primary); font-size: 1.1rem;" id="resTrain"></strong>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase;">From</div>
+                        <strong style="color: var(--text-primary); font-size: 1.1rem;" id="resFrom"></strong>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase;">To</div>
+                        <strong style="color: var(--text-primary); font-size: 1.1rem;" id="resTo"></strong>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase;">Date</div>
+                        <strong style="color: var(--text-primary); font-size: 1.1rem;" id="resDate"></strong>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase;">Class</div>
+                        <strong style="color: var(--text-primary); font-size: 1.1rem;" id="resClass"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 16px; font-size: 1.5rem;">Passenger Details</h3>
+            <div id="passengerContainer" class="pnr-details-grid">
+                <!-- Populated by JS -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-list">
+            <a href="/track-train" class="bottom-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/between-stations" class="bottom-nav-item">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="/train-status" class="bottom-nav-item">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Live</span>
+            </a>
+            <a href="/pnr" class="bottom-nav-item active">
+                <i class="fas fa-ticket-alt"></i>
+                <span>PNR</span>
+            </a>
+            <a href="/seat-availability" class="bottom-nav-item">
+                <i class="fas fa-couch"></i>
+                <span>Seats</span>
+            </a>
+        </ul>
+    </nav>
+
+    <script src="/script.js"></script>
+    <script>
+        document.getElementById('pnrForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pnr = document.getElementById('pnrInput').value;
+            
+            if (pnr.length !== 10) {
+                alert("Please enter a valid 10-digit PNR.");
+                return;
+            }
+
+            const resultsContainer = document.getElementById('pnrResults');
+            const loadingState = document.getElementById('loadingState');
+            
+            resultsContainer.style.display = 'none';
+            loadingState.style.display = 'block';
+
+            try {
+                let pnrData = await window.RailTrack.fetchPNRStatus(pnr);
+                loadingState.style.display = 'none';
+
+                if (pnrData) {
+                    renderPNR(pnrData);
+                } else {
+                    throw new Error('API_LIMIT_EXCEEDED');
+                }
+            } catch (err) {
+                loadingState.style.display = 'none';
+                resultsContainer.style.display = 'block';
+                
+                const container = document.getElementById('passengerContainer');
+                container.innerHTML = '';
+                
+                document.getElementById('resPnr').textContent = pnr;
+                document.getElementById('resTrain').textContent = 'N/A';
+                document.getElementById('resFrom').textContent = 'N/A';
+                document.getElementById('resTo').textContent = 'N/A';
+                document.getElementById('resDate').textContent = 'N/A';
+                document.getElementById('resClass').textContent = 'N/A';
+                
+                const errCard = document.createElement('div');
+                errCard.className = 'glass-panel empty-state';
+                errCard.style.gridColumn = '1/-1';
+                errCard.style.padding = '40px';
+                errCard.style.textAlign = 'center';
+                errCard.innerHTML = `
+                    <div style="font-size: 2.5rem; color: var(--accent-secondary); margin-bottom: 16px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Service Unavailable</h3>
+                    <p style="color: var(--text-secondary); margin-top: 8px;">The IRCTC PNR database is currently experiencing heavy load or API Rate Limit has been exceeded. Please try again later.</p>
+                `;
+                container.appendChild(errCard);
+            }
+        });
+
+        function renderPNR(data) {
+            document.getElementById('resPnr').textContent = data.pnrNumber || data.pnr;
+            document.getElementById('resTrain').textContent = `${data.trainName || 'Unknown'} (${data.trainNumber || ''})`;
+            document.getElementById('resFrom').textContent = data.sourceStation || data.from || 'N/A';
+            document.getElementById('resTo').textContent = data.destinationStation || data.to || 'N/A';
+            document.getElementById('resDate').textContent = data.dateOfJourney || data.date || 'N/A';
+            document.getElementById('resClass').textContent = data.journeyClass || data.class || 'N/A';
+
+            const container = document.getElementById('passengerContainer');
+            container.innerHTML = '';
+
+            const passengers = data.passengerList || data.passengers || [];
+
+            passengers.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel passenger-card';
+                
+                // Determine Badge color
+                let badgeClass = 'badge-neutral';
+                const status = (p.currentStatus || 'N/A').toUpperCase();
+                if (status.includes('CNF')) badgeClass = 'badge-success';
+                else if (status.includes('WL')) badgeClass = 'badge-warning';
+
+                card.innerHTML = `
+                    <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: var(--accent-secondary);">Passenger ${p.passengerSerialNumber || (idx + 1)}</div>
+                    
+                    <div class="p-info-row">
+                        <span class="p-label">Booking Status</span>
+                        <span class="p-val">${p.bookingStatus || 'N/A'}</span>
+                    </div>
+                    
+                    <div class="p-info-row">
+                        <span class="p-label">Current Status</span>
+                        <span class="badge ${badgeClass}">${p.currentStatus || 'N/A'}</span>
+                    </div>
+                    
+                    <div class="p-info-row">
+                        <span class="p-label">Coach</span>
+                        <span class="p-val">${p.bookingCoachId || p.coach || 'N/A'}</span>
+                    </div>
+                    
+                    <div class="p-info-row">
+                        <span class="p-label">Berth</span>
+                        <span class="p-val">${p.bookingBerthNo || p.berth || 'N/A'}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('pnrResults').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

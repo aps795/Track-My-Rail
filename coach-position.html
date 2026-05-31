@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Position | Track My Rail</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .coach-search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dev-console {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #38bdf8;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.05);
+            text-align: left;
+        }
+
+        .dev-console h3 {
+            color: var(--accent-primary);
+            font-family: inherit;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dev-property {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .dev-key {
+            color: #a7f3d0;
+            font-weight: bold;
+        }
+
+        .dev-val {
+            color: #f1f5f9;
+        }
+
+        .dev-code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            color: #f472b6;
+            overflow-x: auto;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Autocomplete relative to input */
+        .search-input-group {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: var(--bg-level-3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 8px;
+            display: none;
+            text-align: left;
+        }
+
+        .ac-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover { background: rgba(0, 229, 255, 0.1); }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="/track-train" class="logo" style="text-decoration: none;">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+            <ul class="desktop-menu">
+                <li><a href="/track-train">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status">Live Status</a></li>
+                <li><a href="/pnr">PNR Status</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 120px 20px 100px; text-align: center;">
+        <h1 style="margin-bottom: 24px; font-size: 2.5rem;">Coach <span class="gradient-text">Position</span></h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 32px;">
+            Find the exact arrangement and composition of coaches for your train, including engine layout, sleeper, AC, and pantry cars.
+        </p>
+
+        <div class="glass-panel coach-search-container" style="padding: 32px;">
+            <form id="coachForm" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="search-input-group">
+                    <label style="display: block; text-align: left; margin-bottom: 8px; color: var(--text-secondary);">Train Name or Number</label>
+                    <input type="text" id="trainInput" class="input-modern" placeholder="e.g. 12951 or Rajdhani" autocomplete="off" required>
+                    <div class="autocomplete-dropdown" id="trainDropdown"></div>
+                </div>
+                <button type="submit" class="btn-primary" style="height: 52px; font-size: 1.1rem; width: 100%;">Locate Coaches</button>
+            </form>
+        </div>
+
+        <div id="resultsContainer" style="max-width: 800px; margin: 40px auto 0; display: none;">
+            <div id="loadingState" style="display: none; padding: 40px;">
+                <div class="skeleton skeleton-title" style="width: 50%; margin: 0 auto 20px;"></div>
+                <div class="skeleton skeleton-card" style="height: 150px;"></div>
+            </div>
+
+            <div id="specContainer" style="display: none;">
+                <!-- Spec sheet rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-list">
+            <a href="/track-train" class="bottom-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/between-stations" class="bottom-nav-item">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="/train-status" class="bottom-nav-item">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Live</span>
+            </a>
+            <a href="/pnr" class="bottom-nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>PNR</span>
+            </a>
+        </ul>
+    </nav>
+
+    <script src="../script.js"></script>
+    <script>
+        // Debounce Helper
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const trainInput = document.getElementById('trainInput');
+            const trainDropdown = document.getElementById('trainDropdown');
+
+            // Autocomplete Setup
+            trainInput.addEventListener('input', debounce(async (e) => {
+                const val = e.target.value;
+                if (!val || val.length < 2) {
+                    trainDropdown.innerHTML = '';
+                    trainDropdown.style.display = 'none';
+                    return;
+                }
+
+                trainDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                trainDropdown.style.display = 'block';
+
+                try {
+                    const results = await window.RailTrack.fuzzySearchTrains(val);
+                    trainDropdown.innerHTML = '';
+
+                    if (results && results.length > 0) {
+                        results.forEach((t) => {
+                            const div = document.createElement('div');
+                            div.className = 'ac-item';
+                            div.innerHTML = `<div style="font-weight: 600;">${t.trainNumber} - ${t.trainName}</div>`;
+                            div.addEventListener('click', () => {
+                                trainInput.value = t.trainNumber;
+                                trainDropdown.style.display = 'none';
+                            });
+                            trainDropdown.appendChild(div);
+                        });
+                    } else {
+                        trainDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No trains found</div>';
+                    }
+                } catch(e) {
+                    trainDropdown.innerHTML = '<div class="ac-item" style="color: var(--semantic-error);">Error searching data</div>';
+                }
+            }, 300));
+
+            // Hide autocomplete on blur
+            document.addEventListener('click', (e) => {
+                if (!trainInput.contains(e.target) && !trainDropdown.contains(e.target)) {
+                    trainDropdown.style.display = 'none';
+                }
+            });
+
+            // Form Submit
+            document.getElementById('coachForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const trainNo = trainInput.value.trim();
+
+                const resultsContainer = document.getElementById('resultsContainer');
+                const loadingState = document.getElementById('loadingState');
+                const specContainer = document.getElementById('specContainer');
+
+                resultsContainer.style.display = 'block';
+                loadingState.style.display = 'block';
+                specContainer.style.display = 'none';
+
+                setTimeout(() => {
+                    loadingState.style.display = 'none';
+                    specContainer.innerHTML = `
+                        <div class="glass-panel" style="padding: 32px; border-color: rgba(239, 68, 68, 0.2);">
+                            <div style="font-size: 2.5rem; color: var(--semantic-warning); margin-bottom: 16px;">
+                                <i class="fas fa-code-branch"></i>
+                            </div>
+                            <h2 style="color: var(--text-primary); margin-bottom: 12px;">Missing API Specification</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                                The coach position feature requires an active integration endpoint that is not included in the basic RapidAPI quota package. Review the structural specifications below to complete installation:
+                            </p>
+
+                            <div class="dev-console">
+                                <h3><i class="fas fa-terminal"></i> INTEGRATION ARCHITECTURE SPEC</h3>
+                                <div class="dev-property"><span class="dev-key">Feature Name:</span> <span class="dev-val">Coach Position Layout Tracker</span></div>
+                                <div class="dev-property"><span class="dev-key">Required API:</span> <span class="dev-val">irctc1.p.rapidapi.com / getCoachPosition</span></div>
+                                <div class="dev-property"><span class="dev-key">Suggested Provider:</span> <span class="dev-val">RapidAPI (Premium Railway Data Package)</span></div>
+                                <div class="dev-property"><span class="dev-key">Target Endpoint:</span> <span class="dev-val">GET /api/v1/coachPosition</span></div>
+                                <div class="dev-property"><span class="dev-key">Query Parameters:</span> <span class="dev-val">?trainNo=${trainNo}</span></div>
+                                <div class="dev-property">
+                                    <span class="dev-key">Setup Instructions:</span>
+                                    <div class="dev-val" style="margin-top: 8px; font-family: sans-serif; line-height: 1.4;">
+                                        1. Map a proxy endpoint <code style="color: #f472b6;">app.get('/api/coach-position')</code> in <code style="color: #f472b6;">backend.js</code>.<br>
+                                        2. Invoke <code style="color: #f472b6;">fetchFromRapidAPI('/api/v1/coachPosition', { trainNo })</code> with active developer credentials.<br>
+                                        3. Loop over the returned sequence array (e.g. engine, A1, B1, S1, SLR) and render them visually using CSS flex blocks.
+                                    </div>
+                                </div>
+                                <div class="dev-property">
+                                    <span class="dev-key">Sample Schema Output:</span>
+                                    <pre class="dev-code">{
+  "success": true,
+  "trainNumber": "${trainNo}",
+  "coaches": ["LOCO", "DVR", "S1", "S2", "S3", "PC", "B1", "B2", "A1", "H1", "SLR"]
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    specContainer.style.display = 'block';
+                }, 800);
+            });
+        });
+    </script>
+</body>
+</html>

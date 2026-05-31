@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Track My Rail | Premium Journey Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 40px 20px;
+            margin-top: 20px;
+        }
+
+        .bg-animated {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+
+        /* Tabs System */
+        .search-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .search-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            border-bottom: none;
+        }
+
+        .search-tab {
+            flex: 1;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+
+        .search-tab.active {
+            background: var(--bg-level-2);
+            color: var(--accent-primary);
+            box-shadow: inset 0 2px 0 0 var(--accent-primary);
+        }
+
+        .search-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+        }
+
+        .search-body {
+            background: var(--bg-level-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 0 0 12px 12px;
+            padding: 32px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Search Inputs */
+        .search-input-group {
+            position: relative;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .search-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .search-input-group input {
+            padding: 18px 24px;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            text-align: left;
+        }
+        @media(min-width: 768px) {
+            .search-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Autocomplete Dropdown */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-level-3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 8px;
+            display: none;
+            text-align: left;
+        }
+
+        .ac-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ac-item:last-child {
+            border-bottom: none;
+        }
+
+        .ac-item.active, .ac-item:hover {
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .ac-primary {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ac-secondary {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 60px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="/track-train" class="logo">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+            <ul class="desktop-menu">
+                <li><a href="/track-train" class="active">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status">Live Status</a></li>
+                <li><a href="/pnr">PNR</a></li>
+                <li><a href="/seat-availability">Seats</a></li>
+                <li><a href="/fare-enquiry">Fare</a></li>
+                <li><a href="/coach-position">Coach</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero-section">
+            <div class="bg-animated">
+                <div class="bg-grid"></div>
+            </div>
+
+            <div style="animation: fadeIn 0.8s ease; width: 100%;">
+                <h1 class="hero-title">Track Any Train. <span class="gradient-text">Live.</span></h1>
+                
+                <div class="search-container">
+                    <div class="search-tabs">
+                        <div class="search-tab active" data-tab="tab-track"><i class="fas fa-location-crosshairs"></i> Track Train</div>
+                        <div class="search-tab" data-tab="tab-find"><i class="fas fa-search"></i> Find Trains</div>
+                        <div class="search-tab" data-tab="tab-pnr"><i class="fas fa-ticket-alt"></i> PNR Status</div>
+                    </div>
+                    
+                    <div class="search-body">
+                        
+                        <!-- TAB: TRACK TRAIN -->
+                        <div class="tab-content active" id="tab-track">
+                            <form id="trackForm">
+                                <div class="search-input-group">
+                                    <label>Train Name or Number</label>
+                                    <input type="text" id="trackInput" class="input-modern" placeholder="e.g. Rajdhani or 12951" autocomplete="off">
+                                    <div class="autocomplete-dropdown" id="trackDropdown"></div>
+                                </div>
+                                <!-- No button needed, selection from dropdown tracks directly -->
+                            </form>
+                        </div>
+
+                        <!-- TAB: FIND TRAINS -->
+                        <div class="tab-content" id="tab-find">
+                            <form id="findForm">
+                                <div class="search-grid">
+                                    <div class="search-input-group">
+                                        <label>From Station</label>
+                                        <input type="text" id="fromInput" class="input-modern" placeholder="e.g. NDLS or New Delhi" autocomplete="off" required>
+                                        <div class="autocomplete-dropdown" id="fromDropdown"></div>
+                                    </div>
+                                    <div class="search-input-group">
+                                        <label>To Station</label>
+                                        <input type="text" id="toInput" class="input-modern" placeholder="e.g. MMCT or Mumbai" autocomplete="off" required>
+                                        <div class="autocomplete-dropdown" id="toDropdown"></div>
+                                    </div>
+                                </div>
+                                <div class="search-input-group" style="margin-bottom: 24px;">
+                                    <label>Journey Date</label>
+                                    <input type="date" id="dateInput" class="input-modern" required>
+                                </div>
+                                <button type="submit" class="btn-primary" style="width: 100%; height: 52px; font-size: 1.1rem;">Search Trains</button>
+                            </form>
+                        </div>
+
+                        <!-- TAB: PNR STATUS -->
+                        <div class="tab-content" id="tab-pnr">
+                            <form id="pnrForm">
+                                <div class="search-input-group" style="margin-bottom: 24px;">
+                                    <label>PNR Number</label>
+                                    <input type="text" id="pnrInputMain" class="input-modern" placeholder="Enter 10-digit PNR" pattern="[0-9]{10}" required autocomplete="off" style="text-align: center; letter-spacing: 2px;">
+                                </div>
+                                <button type="submit" class="btn-primary" style="width: 100%; height: 52px; font-size: 1.1rem;">Check PNR Status</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="feature-badges">
+                    <span class="badge badge-neutral"><i class="fas fa-satellite-dish"></i> Live Status</span>
+                    <span class="badge badge-neutral"><i class="fas fa-route"></i> Route Tracking</span>
+                    <span class="badge badge-neutral"><i class="fas fa-clock"></i> ETA Prediction</span>
+                    <span class="badge badge-neutral"><i class="fas fa-bolt"></i> Instant Suggestions</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-list">
+            <a href="/track-train" class="bottom-nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/between-stations" class="bottom-nav-item">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="/train-status" class="bottom-nav-item">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Live</span>
+            </a>
+            <a href="/pnr" class="bottom-nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>PNR</span>
+            </a>
+            <a href="/seat-availability" class="bottom-nav-item">
+                <i class="fas fa-couch"></i>
+                <span>Seats</span>
+            </a>
+        </ul>
+    </nav>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching logic
+            const tabs = document.querySelectorAll('.search-tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+                });
+            });
+
+            // Set Date to Today
+            const dateInput = document.getElementById('dateInput');
+            if(dateInput) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+
+            // Debounce Helper
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
+            }
+
+            // Track Train Autocomplete
+            const trackInput = document.getElementById('trackInput');
+            const trackDropdown = document.getElementById('trackDropdown');
+            let trackActiveIndex = -1;
+
+            trackInput.addEventListener('input', debounce(async (e) => {
+                const val = e.target.value;
+                if (!val || val.length < 2) {
+                    trackDropdown.innerHTML = '';
+                    trackDropdown.style.display = 'none';
+                    return;
+                }
+
+                // Show loading state
+                trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                trackDropdown.style.display = 'block';
+
+                try {
+                    const results = await window.RailTrack.fuzzySearchTrains(val);
+                    if (results === null) return;
+                    trackDropdown.innerHTML = '';
+                    trackActiveIndex = -1;
+
+                    if (results.length > 0) {
+                        results.forEach((t, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'ac-item';
+                            div.innerHTML = `
+                                <div class="ac-primary">${t.trainNumber} - ${t.trainName}</div>
+                                <div class="ac-secondary"><i class="fas fa-route"></i> ${t.from} &rarr; ${t.to}</div>
+                            `;
+                            div.addEventListener('click', () => {
+                                window.location.href = `/train-status?train=${t.trainNumber}`;
+                            });
+                            trackDropdown.appendChild(div);
+                        });
+                    } else {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No trains found</div>';
+                    }
+                } catch (err) {
+                    if (err.message === 'API_LIMIT_EXCEEDED') {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> API Rate Limit Exceeded</div>';
+                    } else {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> Service Unavailable</div>';
+                    }
+                }
+            }, 300));
+
+            // Station Autocomplete logic
+            function setupStationAutocomplete(inputId, dropdownId) {
+                const input = document.getElementById(inputId);
+                const dropdown = document.getElementById(dropdownId);
+                
+                input.addEventListener('input', debounce(async (e) => {
+                    const val = e.target.value;
+                    if (!val || val.length < 2) {
+                        dropdown.innerHTML = '';
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+
+                    dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    dropdown.style.display = 'block';
+
+                    try {
+                        const results = await window.RailTrack.fuzzySearchStations(val);
+                        if (results === null) return;
+                        dropdown.innerHTML = '';
+
+                        if (results.length > 0) {
+                            results.forEach((s) => {
+                                const div = document.createElement('div');
+                                div.className = 'ac-item';
+                                div.innerHTML = `
+                                    <div class="ac-primary">${s.name} (${s.code})</div>
+                                `;
+                                div.addEventListener('click', () => {
+                                    input.value = s.code;
+                                    dropdown.style.display = 'none';
+                                });
+                                dropdown.appendChild(div);
+                            });
+                        } else {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
+                        }
+                    } catch (err) {
+                        if (err.message === 'API_LIMIT_EXCEEDED') {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> API Rate Limit Exceeded</div>';
+                        } else {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> Service Unavailable</div>';
+                        }
+                    }
+                }, 300));
+
+                // Hide on blur
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            setupStationAutocomplete('fromInput', 'fromDropdown');
+            setupStationAutocomplete('toInput', 'toDropdown');
+
+            // Find Trains Form Submission
+            document.getElementById('findForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const from = document.getElementById('fromInput').value;
+                const to = document.getElementById('toInput').value;
+                const date = document.getElementById('dateInput').value;
+                window.location.href = `/between-stations?from=${from}&to=${to}&date=${date}`;
+            });
+
+            // PNR Form Submission
+            document.getElementById('pnrForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const pnr = document.getElementById('pnrInputMain').value;
+                window.location.href = `/pnr?pnr=${pnr}`;
+            });
+            
+            // Keyboard navigation for Track Train
+            trackInput.addEventListener('keydown', (e) => {
+                const items = trackDropdown.querySelectorAll('.ac-item');
+                if (!items.length) return;
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    trackActiveIndex = (trackActiveIndex + 1) % items.length;
+                    updateActiveItem(items, trackActiveIndex);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    trackActiveIndex = (trackActiveIndex - 1 + items.length) % items.length;
+                    updateActiveItem(items, trackActiveIndex);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (trackActiveIndex > -1) {
+                        items[trackActiveIndex].click();
+                    }
+                }
+            });
+
+            function updateActiveItem(items, index) {
+                items.forEach(item => item.classList.remove('active'));
+                items[index].classList.add('active');
+            }
+            
+            // Close track dropdown on outside click
+            document.addEventListener('click', (e) => {
+                if (e.target !== trackInput && !trackDropdown.contains(e.target)) {
+                    trackDropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

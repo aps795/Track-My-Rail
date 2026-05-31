@@ -364,39 +364,39 @@ app.use('/pages', express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname)));
 
 app.get('/track-train', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'track-train.html'));
 });
 
 app.get('/train-status', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'live-status.html'));
+    res.sendFile(path.join(__dirname, 'train-status.html'));
 });
 
 app.get('/route', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'train-details.html'));
+    res.sendFile(path.join(__dirname, 'route.html'));
 });
 
 app.get('/between-stations', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'train-search.html'));
+    res.sendFile(path.join(__dirname, 'between-stations.html'));
 });
 
 app.get('/pnr', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'pnr-status.html'));
+    res.sendFile(path.join(__dirname, 'pnr.html'));
 });
 
 app.get('/seat-availability', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'seat-availability.html'));
+    res.sendFile(path.join(__dirname, 'seat-availability.html'));
 });
 
 app.get('/fare-enquiry', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'fare-enquiry.html'));
+    res.sendFile(path.join(__dirname, 'fare-enquiry.html'));
 });
 
 app.get('/train-details', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'train-details.html'));
+    res.sendFile(path.join(__dirname, 'train-details.html'));
 });
 
 app.get('/coach-position', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'coach-position.html'));
+    res.sendFile(path.join(__dirname, 'coach-position.html'));
 });
 
 // Global error handler
