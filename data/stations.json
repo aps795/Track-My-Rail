@@ -1,0 +1,302 @@
+[
+  {
+    "code": "NDLS",
+    "name": "New Delhi",
+    "city": "Delhi",
+    "state": "Delhi"
+  },
+  {
+    "code": "CSMT",
+    "name": "Chhatrapati Shivaji Maharaj Terminus",
+    "city": "Mumbai",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "HWH",
+    "name": "Howrah Junction",
+    "city": "Kolkata",
+    "state": "West Bengal"
+  },
+  {
+    "code": "MAS",
+    "name": "Chennai Central",
+    "city": "Chennai",
+    "state": "Tamil Nadu"
+  },
+  {
+    "code": "SBC",
+    "name": "KSR Bengaluru",
+    "city": "Bangalore",
+    "state": "Karnataka"
+  },
+  {
+    "code": "PNBE",
+    "name": "Patna Junction",
+    "city": "Patna",
+    "state": "Bihar"
+  },
+  {
+    "code": "LKO",
+    "name": "Lucknow Charbagh",
+    "city": "Lucknow",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "CNB",
+    "name": "Kanpur Central",
+    "city": "Kanpur",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "ALD",
+    "name": "Allahabad Junction",
+    "city": "Allahabad",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "BSB",
+    "name": "Varanasi Junction",
+    "city": "Varanasi",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "JP",
+    "name": "Jaipur Junction",
+    "city": "Jaipur",
+    "state": "Rajasthan"
+  },
+  {
+    "code": "ADI",
+    "name": "Ahmedabad Junction",
+    "city": "Ahmedabad",
+    "state": "Gujarat"
+  },
+  {
+    "code": "PUNE",
+    "name": "Pune Junction",
+    "city": "Pune",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "SC",
+    "name": "Secunderabad Junction",
+    "city": "Hyderabad",
+    "state": "Telangana"
+  },
+  {
+    "code": "BZA",
+    "name": "Vijayawada Junction",
+    "city": "Vijayawada",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "code": "NGP",
+    "name": "Nagpur Junction",
+    "city": "Nagpur",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "BPL",
+    "name": "Bhopal Junction",
+    "city": "Bhopal",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "code": "INDB",
+    "name": "Indore Junction",
+    "city": "Indore",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "code": "GHY",
+    "name": "Guwahati",
+    "city": "Guwahati",
+    "state": "Assam"
+  },
+  {
+    "code": "ASR",
+    "name": "Amritsar Junction",
+    "city": "Amritsar",
+    "state": "Punjab"
+  },
+  {
+    "code": "LDH",
+    "name": "Ludhiana Junction",
+    "city": "Ludhiana",
+    "state": "Punjab"
+  },
+  {
+    "code": "CDG",
+    "name": "Chandigarh",
+    "city": "Chandigarh",
+    "state": "Chandigarh"
+  },
+  {
+    "code": "DLI",
+    "name": "Old Delhi",
+    "city": "Delhi",
+    "state": "Delhi"
+  },
+  {
+    "code": "NZM",
+    "name": "Hazrat Nizamuddin",
+    "city": "Delhi",
+    "state": "Delhi"
+  },
+  {
+    "code": "ANVT",
+    "name": "Anand Vihar Terminal",
+    "city": "Delhi",
+    "state": "Delhi"
+  },
+  {
+    "code": "BCT",
+    "name": "Mumbai Central",
+    "city": "Mumbai",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "LTT",
+    "name": "Lokmanya Tilak Terminus",
+    "city": "Mumbai",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "BDTS",
+    "name": "Bandra Terminus",
+    "city": "Mumbai",
+    "state": "Maharashtra"
+  },
+  {
+    "code": "SDAH",
+    "name": "Sealdah",
+    "city": "Kolkata",
+    "state": "West Bengal"
+  },
+  {
+    "code": "KOAA",
+    "name": "Kolkata",
+    "city": "Kolkata",
+    "state": "West Bengal"
+  },
+  {
+    "code": "MS",
+    "name": "Chennai Egmore",
+    "city": "Chennai",
+    "state": "Tamil Nadu"
+  },
+  {
+    "code": "YPR",
+    "name": "Yesvantpur Junction",
+    "city": "Bangalore",
+    "state": "Karnataka"
+  },
+  {
+    "code": "TVC",
+    "name": "Thiruvananthapuram Central",
+    "city": "Thiruvananthapuram",
+    "state": "Kerala"
+  },
+  {
+    "code": "ERS",
+    "name": "Ernakulam Junction",
+    "city": "Kochi",
+    "state": "Kerala"
+  },
+  {
+    "code": "CBE",
+    "name": "Coimbatore Junction",
+    "city": "Coimbatore",
+    "state": "Tamil Nadu"
+  },
+  {
+    "code": "MDU",
+    "name": "Madurai Junction",
+    "city": "Madurai",
+    "state": "Tamil Nadu"
+  },
+  {
+    "code": "TPTY",
+    "name": "Tirupati",
+    "city": "Tirupati",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "code": "VSKP",
+    "name": "Visakhapatnam",
+    "city": "Visakhapatnam",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "code": "BBS",
+    "name": "Bhubaneswar",
+    "city": "Bhubaneswar",
+    "state": "Odisha"
+  },
+  {
+    "code": "PURI",
+    "name": "Puri",
+    "city": "Puri",
+    "state": "Odisha"
+  },
+  {
+    "code": "RNC",
+    "name": "Ranchi Junction",
+    "city": "Ranchi",
+    "state": "Jharkhand"
+  },
+  {
+    "code": "TATA",
+    "name": "Tatanagar Junction",
+    "city": "Jamshedpur",
+    "state": "Jharkhand"
+  },
+  {
+    "code": "RPR",
+    "name": "Raipur Junction",
+    "city": "Raipur",
+    "state": "Chhattisgarh"
+  },
+  {
+    "code": "JAT",
+    "name": "Jammu Tawi",
+    "city": "Jammu",
+    "state": "Jammu & Kashmir"
+  },
+  {
+    "code": "SVDK",
+    "name": "SMVD Katra",
+    "city": "Katra",
+    "state": "Jammu & Kashmir"
+  },
+  {
+    "code": "DDN",
+    "name": "Dehradun",
+    "city": "Dehradun",
+    "state": "Uttarakhand"
+  },
+  {
+    "code": "HW",
+    "name": "Haridwar",
+    "city": "Haridwar",
+    "state": "Uttarakhand"
+  },
+  {
+    "code": "MB",
+    "name": "Moradabad",
+    "city": "Moradabad",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "BE",
+    "name": "Bareilly",
+    "city": "Bareilly",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "code": "GKP",
+    "name": "Gorakhpur Junction",
+    "city": "Gorakhpur",
+    "state": "Uttar Pradesh"
+  }
+]

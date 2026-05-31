@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seat Availability | Track My Rail</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .seat-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        @media(min-width: 768px) {
+            .seat-form { grid-template-columns: 1fr 1fr; }
+            .seat-form .full-width { grid-column: span 2; }
+        }
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .class-card {
+            background: var(--bg-level-3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .class-card h3 {
+            font-size: 1.2rem;
+            color: var(--accent-primary);
+        }
+        .class-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        .status-avail { background: rgba(16, 185, 129, 0.2); color: var(--semantic-success); }
+        .status-wl { background: rgba(239, 68, 68, 0.2); color: var(--semantic-error); }
+        .status-rac { background: rgba(245, 158, 11, 0.2); color: var(--semantic-warning); }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="../index.html" class="logo" style="text-decoration: none;">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: 120px 20px 100px;">
+        <h1 style="margin-bottom: 24px; font-size: 2.5rem;">Seat <span class="gradient-text">Availability</span></h1>
+
+        <div class="glass-panel" style="padding: 24px;">
+            <form id="seatForm" class="seat-form">
+                <div class="search-input-group full-width">
+                    <label>Train Number</label>
+                    <input type="text" id="trainInput" class="input-modern" placeholder="e.g. 12951" required>
+                </div>
+                <div class="search-input-group">
+                    <label>From Station Code</label>
+                    <input type="text" id="fromInput" class="input-modern" placeholder="e.g. MMCT" required>
+                </div>
+                <div class="search-input-group">
+                    <label>To Station Code</label>
+                    <input type="text" id="toInput" class="input-modern" placeholder="e.g. NDLS" required>
+                </div>
+                <div class="search-input-group">
+                    <label>Journey Date</label>
+                    <input type="date" id="dateInput" class="input-modern" required>
+                </div>
+                <div class="search-input-group">
+                    <label>Class</label>
+                    <select id="classInput" class="input-modern" required>
+                        <option value="ALL">All Classes</option>
+                        <option value="1A">1A</option>
+                        <option value="2A">2A</option>
+                        <option value="3A">3A</option>
+                        <option value="SL">SL</option>
+                        <option value="CC">CC</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary full-width" style="height: 52px;">Check Availability</button>
+            </form>
+        </div>
+
+        <div id="resultsContainer" style="margin-top: 40px; display: none;">
+            <h2 style="margin-bottom: 16px;">Availability Results</h2>
+            <div id="loadingState" style="display: none;">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+            <div id="dataContainer" class="class-grid"></div>
+        </div>
+    </main>
+
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+
+            document.getElementById('seatForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const train = document.getElementById('trainInput').value.trim();
+                const from = document.getElementById('fromInput').value.trim().toUpperCase();
+                const to = document.getElementById('toInput').value.trim().toUpperCase();
+                const date = document.getElementById('dateInput').value;
+                const cls = document.getElementById('classInput').value;
+
+                const resultsContainer = document.getElementById('resultsContainer');
+                const loadingState = document.getElementById('loadingState');
+                const dataContainer = document.getElementById('dataContainer');
+
+                resultsContainer.style.display = 'block';
+                loadingState.style.display = 'block';
+                dataContainer.innerHTML = '';
+
+                try {
+                    const data = await RailTrack.fetchSeatAvailability(train, from, to, date, cls);
+                    loadingState.style.display = 'none';
+
+                    // Mock presentation logic assuming standard API response
+                    const availabilities = data.availability || [];
+                    if (availabilities.length === 0) {
+                        dataContainer.innerHTML = '<p style="color: var(--text-secondary)">No availability data found.</p>';
+                        return;
+                    }
+
+                    availabilities.forEach(av => {
+                        let statusClass = 'status-wl';
+                        if(av.status.includes('AVAILABLE') || av.status.includes('CURR')) statusClass = 'status-avail';
+                        else if(av.status.includes('RAC')) statusClass = 'status-rac';
+
+                        const div = document.createElement('div');
+                        div.className = 'class-card glass-panel';
+                        div.innerHTML = `
+                            <h3>${av.classType || cls}</h3>
+                            <p>${av.date}</p>
+                            <span class="status-badge ${statusClass}">${av.status}</span>
+                            <p style="font-size: 0.8rem; margin-top: 8px; color: var(--text-muted)">Fare: ₹${av.fare || 'N/A'}</p>
+                        `;
+                        dataContainer.appendChild(div);
+                    });
+
+                } catch (err) {
+                    loadingState.style.display = 'none';
+                    if (err.message === 'API_LIMIT_EXCEEDED') {
+                        dataContainer.innerHTML = `
+                            <div class="empty-state" style="grid-column: 1/-1;">
+                                <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: var(--accent-secondary)"></i></div>
+                                <h3>Service Unavailable</h3>
+                                <p>The IRCTC API rate limit has been exceeded.</p>
+                            </div>
+                        `;
+                    } else {
+                        dataContainer.innerHTML = `<p style="color: var(--semantic-error); grid-column: 1/-1;">Error fetching data.</p>`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

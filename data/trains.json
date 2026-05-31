@@ -1,0 +1,212 @@
+[
+  {
+    "trainNumber": "12951",
+    "trainName": "Mumbai Rajdhani Express",
+    "source": "MMCT",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12953",
+    "trainName": "August Kranti Rajdhani Express",
+    "source": "MMCT",
+    "destination": "NZM",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12301",
+    "trainName": "Howrah Rajdhani Express",
+    "source": "HWH",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat"
+  },
+  {
+    "trainNumber": "12309",
+    "trainName": "Rajendra Nagar Patna Rajdhani Express",
+    "source": "RJPB",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12431",
+    "trainName": "Trivandrum Rajdhani Express",
+    "source": "TVC",
+    "destination": "NZM",
+    "runningDays": "Tue, Thu, Fri"
+  },
+  {
+    "trainNumber": "12433",
+    "trainName": "Chennai Rajdhani Express",
+    "source": "MAS",
+    "destination": "NZM",
+    "runningDays": "Fri, Sun"
+  },
+  {
+    "trainNumber": "12003",
+    "trainName": "New Delhi Lucknow Swarna Shatabdi",
+    "source": "LKO",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12005",
+    "trainName": "Kalka Shatabdi Express",
+    "source": "NDLS",
+    "destination": "KLK",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12009",
+    "trainName": "Mumbai Central Ahmedabad Shatabdi",
+    "source": "MMCT",
+    "destination": "ADI",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat"
+  },
+  {
+    "trainNumber": "22439",
+    "trainName": "Vande Bharat Express",
+    "source": "NDLS",
+    "destination": "SVDK",
+    "runningDays": "Mon, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "22436",
+    "trainName": "Vande Bharat Express",
+    "source": "NDLS",
+    "destination": "BSB",
+    "runningDays": "Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12801",
+    "trainName": "Purushottam Express",
+    "source": "PURI",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12137",
+    "trainName": "Punjab Mail",
+    "source": "CSMT",
+    "destination": "FZR",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12860",
+    "trainName": "Gitanjali Express",
+    "source": "HWH",
+    "destination": "CSMT",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12615",
+    "trainName": "Grand Trunk Express",
+    "source": "MAS",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12269",
+    "trainName": "Duronto Express",
+    "source": "MAS",
+    "destination": "NZM",
+    "runningDays": "Mon, Fri"
+  },
+  {
+    "trainNumber": "12259",
+    "trainName": "Sealdah Bikaner Duronto",
+    "source": "SDAH",
+    "destination": "BKN",
+    "runningDays": "Mon, Wed, Thu, Sun"
+  },
+  {
+    "trainNumber": "12903",
+    "trainName": "Golden Temple Mail",
+    "source": "MMCT",
+    "destination": "ASR",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12627",
+    "trainName": "Karnataka Express",
+    "source": "SBC",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12839",
+    "trainName": "Chennai Mail",
+    "source": "HWH",
+    "destination": "MAS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12702",
+    "trainName": "Hussainsagar Express",
+    "source": "HYB",
+    "destination": "CSMT",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12621",
+    "trainName": "Tamil Nadu Express",
+    "source": "MAS",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12141",
+    "trainName": "Patliputra Express",
+    "source": "LTT",
+    "destination": "PPTA",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12311",
+    "trainName": "Netaji Express",
+    "source": "HWH",
+    "destination": "KLK",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12723",
+    "trainName": "Telangana Express",
+    "source": "HYB",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12915",
+    "trainName": "Ashram Express",
+    "source": "ADI",
+    "destination": "DLI",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12417",
+    "trainName": "Prayagraj Express",
+    "source": "PRYJ",
+    "destination": "NDLS",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12555",
+    "trainName": "Gorakhdham Express",
+    "source": "GKP",
+    "destination": "BHI",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12981",
+    "trainName": "Chetak Express",
+    "source": "DEE",
+    "destination": "UDZ",
+    "runningDays": "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+  },
+  {
+    "trainNumber": "12245",
+    "trainName": "Howrah Yesvantpur Duronto",
+    "source": "HWH",
+    "destination": "YPR",
+    "runningDays": "Tue, Wed, Fri, Sat, Sun"
+  }
+]

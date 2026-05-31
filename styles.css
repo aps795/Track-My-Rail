@@ -167,6 +167,102 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
+   Skeleton Loaders
+   ============================================ */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-level-2) 25%, rgba(255,255,255,0.05) 50%, var(--bg-level-2) 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeletonLoading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-text { height: 16px; margin-bottom: 8px; width: 100%; }
+.skeleton-text.short { width: 60%; }
+.skeleton-title { height: 24px; margin-bottom: 16px; width: 80%; }
+.skeleton-card { height: 120px; width: 100%; margin-bottom: 16px; }
+
+/* ============================================
+   Enhanced Vertical Timeline
+   ============================================ */
+.route-timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-top: 24px;
+}
+
+.route-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--glass-border);
+    z-index: 1;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 24px;
+    padding-left: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg-level-3);
+    border: 2px solid var(--text-muted);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.timeline-item.passed::before {
+    background: var(--semantic-success);
+    border-color: var(--semantic-success);
+}
+
+.timeline-item.current::before {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 10px var(--accent-primary);
+    transform: scale(1.3);
+}
+
+.timeline-item.passed::after {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 16px;
+    bottom: -4px;
+    width: 2px;
+    background: var(--semantic-success);
+    z-index: 1;
+}
+
+.timeline-content h4 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.timeline-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 16px;
+}
+
+/* ============================================
    Layout & Navigation
    ============================================ */
 

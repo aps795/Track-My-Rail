@@ -303,6 +303,56 @@ app.get('/api/trains/:trainNo/status', async (req, res) => {
     }
 });
 
+/**
+ * Seat Availability
+ */
+app.get('/api/seat-availability', async (req, res) => {
+    try {
+        const { trainNo, from, to, date, classType } = req.query;
+
+        if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
+            try {
+                const data = await fetchFromRapidAPI('/api/v1/checkSeatAvailability', { trainNo, sourceStationCode: from, destinationStationCode: to, date, classType });
+                return res.json({
+                    success: true,
+                    data: data.data || data,
+                    dataSource: 'RAPID_API'
+                });
+            } catch (apiError) {
+                console.error('RapidAPI Seat Availability Error:', apiError.message);
+            }
+        }
+        res.json({ success: true, data: null, dataSource: 'MOCK_DATA' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * Fare Enquiry
+ */
+app.get('/api/fare-enquiry', async (req, res) => {
+    try {
+        const { trainNo, from, to, classType } = req.query;
+
+        if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
+            try {
+                const data = await fetchFromRapidAPI('/api/v1/trainFare', { trainNo, sourceStationCode: from, destinationStationCode: to, classType });
+                return res.json({
+                    success: true,
+                    data: data.data || data,
+                    dataSource: 'RAPID_API'
+                });
+            } catch (apiError) {
+                console.error('RapidAPI Fare Enquiry Error:', apiError.message);
+            }
+        }
+        res.json({ success: true, data: null, dataSource: 'MOCK_DATA' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('SERVER ERROR:', err.stack);

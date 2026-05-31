@@ -18,6 +18,60 @@ async function apiFetch(path, options = {}) {
     }
 }
 
+// ----------------------------------------------------
+// INTELLIGENT CACHE MANAGER
+// ----------------------------------------------------
+const CacheManager = {
+    set: function(key, data, ttlMinutes) {
+        const now = new Date().getTime();
+        const item = {
+            data: data,
+            expiry: now + (ttlMinutes * 60 * 1000)
+        };
+        localStorage.setItem('cache_' + key, JSON.stringify(item));
+    },
+    get: function(key) {
+        const itemStr = localStorage.getItem('cache_' + key);
+        if (!itemStr) return null;
+        try {
+            const item = JSON.parse(itemStr);
+            if (new Date().getTime() > item.expiry) {
+                localStorage.removeItem('cache_' + key);
+                return null;
+            }
+            return item.data;
+        } catch(e) {
+            return null;
+        }
+    }
+};
+
+// ----------------------------------------------------
+// LOCAL DATA LAYER (Zero API Search)
+// ----------------------------------------------------
+let localTrains = [];
+let localStations = [];
+
+async function initLocalData() {
+    try {
+        // Handle relative paths depending on where script is loaded from
+        const basePath = window.location.pathname.includes('/pages/') ? '../' : './';
+        const [trainsRes, stationsRes] = await Promise.all([
+            fetch(basePath + 'data/trains.json'),
+            fetch(basePath + 'data/stations.json')
+        ]);
+        if (trainsRes.ok) localTrains = await trainsRes.json();
+        if (stationsRes.ok) localStations = await stationsRes.json();
+        console.log('✅ Local Data Layer Initialized');
+    } catch (e) {
+        console.error('Failed to load local datasets', e);
+    }
+}
+
+// Initialize on script load
+initLocalData();
+
+
 async function loginUser(email, password) {
     const response = await apiFetch('/users/login', {
         method: 'POST',
@@ -117,26 +171,67 @@ async function fetchTrains(from, to, date, classType = '') {
 }
 
 async function fetchTrainStatus(trainNumber) {
-    // Backend endpoint is /api/trains/:trainNo/status
-    const response = await apiFetch(`/trains/${trainNumber}/status`);
-    if (response.ok && response.data?.success) {
-        return response.data;
+    const cacheKey = `status_${trainNumber}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached) {
+        console.log('⚡ Returning cached train status (2m TTL)');
+        return cached;
+    }
+
+    try {
+        const response = await apiFetch(`/trains/${trainNumber}/status`);
+        if (response.ok && response.data?.success) {
+            CacheManager.set(cacheKey, response.data, 2); // 2 minutes TTL
+            return response.data;
+        } else {
+            console.error('Status Error:', response.data?.message);
+        }
+    } catch (err) {
+        console.error('Failed to connect to backend:', err.message);
     }
     return null;
 }
 
 async function fetchTrainRoute(trainNumber) {
-    const response = await apiFetch(`/trains/${trainNumber}/route`);
-    if (response.ok && response.data?.success) {
-        return response.data;
+    const cacheKey = `route_${trainNumber}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached) {
+        console.log('⚡ Returning cached train route (30d TTL)');
+        return cached;
+    }
+
+    try {
+        const response = await apiFetch(`/trains/${trainNumber}/route`);
+        if (response.ok && response.data?.success) {
+            CacheManager.set(cacheKey, response.data, 30 * 24 * 60); // 30 days TTL
+            return response.data;
+        } else {
+            console.error('Route Error:', response.data?.message);
+        }
+    } catch (err) {
+        console.error('Failed to connect to backend:', err.message);
     }
     return null;
 }
 
-async function fetchPNRStatus(pnr) {
-    const response = await apiFetch(`/pnr/${pnr}`);
-    if (response.ok && response.data?.success) {
-        return response.data;
+async function fetchPNRStatus(pnrNumber) {
+    const cacheKey = `pnr_${pnrNumber}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached) {
+        console.log('⚡ Returning cached PNR (5m TTL)');
+        return cached;
+    }
+
+    try {
+        const response = await apiFetch(`/pnr/${pnrNumber}`);
+        if (response.ok && response.data?.success) {
+            CacheManager.set(cacheKey, response.data.pnr, 5); // 5 minutes TTL
+            return response.data.pnr;
+        } else {
+            console.error('PNR API Error:', response.data?.message || 'Unknown error');
+        }
+    } catch (err) {
+        console.error('Failed to connect to backend:', err.message);
     }
     return null;
 }
@@ -386,41 +481,73 @@ function clearLocalStorage(key) {
     localStorage.removeItem(key);
 }
 
-// Async Live Search Functions
+// Async Live Search Functions - Now powered by LOCAL DATA ONLY (0 API calls)
 async function fuzzySearchTrains(query) {
     query = query.toLowerCase().trim();
-    if (!query || query.length < 2) return null; // Return null instead of [] for errors
+    if (!query || query.length < 2) return [];
     
-    try {
-        const response = await apiFetch(`/trains/autocomplete?query=${encodeURIComponent(query)}`);
-        if (response.ok && response.data?.success) {
-            if (response.data.dataSource === 'MOCK_DATA') {
-                throw new Error('API_LIMIT_EXCEEDED');
-            }
-            return response.data.trains || [];
-        }
-        throw new Error('API_ERROR');
-    } catch (err) {
-        console.error('Train autocomplete error:', err);
-        throw err;
-    }
+    // Fallback if localTrains didn't load for some reason
+    if (!localTrains || localTrains.length === 0) return [];
+
+    return localTrains.filter(t => 
+        t.trainNumber.includes(query) || 
+        t.trainName.toLowerCase().includes(query)
+    ).map(t => ({
+        trainNumber: t.trainNumber,
+        trainName: t.trainName,
+        from: t.source,
+        to: t.destination
+    })).slice(0, 10);
 }
 
 async function fuzzySearchStations(query) {
     query = query.toLowerCase().trim();
-    if (!query || query.length < 2) return null;
+    if (!query || query.length < 2) return [];
     
+    if (!localStations || localStations.length === 0) return [];
+
+    return localStations.filter(s => 
+        s.code.toLowerCase().includes(query) || 
+        s.name.toLowerCase().includes(query) ||
+        s.city.toLowerCase().includes(query)
+    ).slice(0, 10);
+}
+
+// Seat Availability & Fare Enquiry APIs
+async function fetchSeatAvailability(trainNo, from, to, date, classType) {
+    const cacheKey = `seat_${trainNo}_${from}_${to}_${date}_${classType}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached) return cached;
+
     try {
-        const response = await apiFetch(`/stations/search?query=${encodeURIComponent(query)}`);
+        const response = await apiFetch(`/seat-availability?trainNo=${trainNo}&from=${from}&to=${to}&date=${date}&classType=${classType}`);
         if (response.ok && response.data?.success) {
-            if (response.data.dataSource === 'MOCK_DATA') {
-                throw new Error('API_LIMIT_EXCEEDED');
-            }
-            return response.data.stations || [];
+            if (response.data.dataSource === 'MOCK_DATA') throw new Error('API_LIMIT_EXCEEDED');
+            CacheManager.set(cacheKey, response.data, 5); // 5m TTL
+            return response.data;
         }
         throw new Error('API_ERROR');
-    } catch (err) {
-        console.error('Station autocomplete error:', err);
+    } catch(err) {
+        console.error(err);
+        throw err;
+    }
+}
+
+async function fetchFareEnquiry(trainNo, from, to, classType) {
+    const cacheKey = `fare_${trainNo}_${from}_${to}_${classType}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+        const response = await apiFetch(`/fare-enquiry?trainNo=${trainNo}&from=${from}&to=${to}&classType=${classType}`);
+        if (response.ok && response.data?.success) {
+            if (response.data.dataSource === 'MOCK_DATA') throw new Error('API_LIMIT_EXCEEDED');
+            CacheManager.set(cacheKey, response.data, 24 * 60); // 24h TTL
+            return response.data;
+        }
+        throw new Error('API_ERROR');
+    } catch(err) {
+        console.error(err);
         throw err;
     }
 }
@@ -450,5 +577,7 @@ window.RailTrack = {
     getFromLocalStorage,
     clearLocalStorage,
     fuzzySearchTrains,
-    fuzzySearchStations
+    fuzzySearchStations,
+    fetchSeatAvailability,
+    fetchFareEnquiry
 };

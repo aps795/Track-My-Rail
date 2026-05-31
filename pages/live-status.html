@@ -443,37 +443,39 @@
                 totalDistance = parseInt(data.route[data.route.length - 1].distance) || 1000;
             }
 
+            let html = '<div class="route-timeline">';
+
             data.route.forEach((station) => {
-                const item = document.createElement('div');
-                item.className = `timeline-item ${station.status}`;
-                
+                let statusClass = '';
+                if (station.status === 'current') statusClass = 'current';
+                else if (station.status === 'completed') statusClass = 'passed';
+
                 if (station.status === 'completed' || station.status === 'current') {
                     currentDistance = parseInt(station.distance) || currentDistance;
                 }
 
-                let iconHTML = `<div class="timeline-dot"></div>`;
-                if (station.status === 'current') {
-                    iconHTML = `<div class="timeline-dot"><i class="fas fa-train" style="color: white; font-size: 12px;"></i></div>`;
-                }
-
-                let badge = station.status === 'completed' ? '<span class="badge badge-success">Departed</span>' :
-                            station.status === 'current' ? '<span class="badge badge-warning">Train is here</span>' :
-                            '<span class="badge badge-neutral">Upcoming</span>';
-
-                item.innerHTML = `
-                    ${iconHTML}
-                    <div class="timeline-content">
-                        <div class="station-name">${station.station}</div>
-                        <div class="station-times">
-                            <span>Arr: <strong>${station.arrivalTime || 'N/A'}</strong></span>
-                            <span>Dep: <strong>${station.departureTime || 'N/A'}</strong></span>
-                            <span>Dist: <strong>${station.distance || '0'} km</strong></span>
+                html += `
+                    <div class="timeline-item ${statusClass}">
+                        <div class="timeline-content glass-panel" style="padding: 16px; margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h4>${station.station}</h4>
+                                    <div class="timeline-meta">
+                                        <span><i class="fas fa-clock"></i> Arr: ${station.arrivalTime || 'Start'}</span>
+                                        <span><i class="fas fa-clock"></i> Dep: ${station.departureTime || 'End'}</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Dist: ${station.distance} km</div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="margin-top: 8px;">${badge}</div>
                     </div>
                 `;
-                timeline.appendChild(item);
             });
+
+            html += '</div>';
+            timeline.innerHTML = html;
 
             // Progress Bar Logic
             document.getElementById('distCovered').textContent = `${currentDistance} km`;
