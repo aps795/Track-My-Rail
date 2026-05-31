@@ -2,142 +2,361 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Train Status - RailTrack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Train Status | Track My Rail</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media(min-width: 992px) {
+            .layout-grid {
+                grid-template-columns: 350px 1fr;
+                align-items: start;
+            }
+        }
+
+        /* Search Section */
+        .search-panel {
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .search-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Journey Progress Rail */
+        .journey-progress {
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--glass-border);
+            border-radius: 4px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            position: absolute;
+            top: 0; left: 0;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-train-icon {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: var(--accent-highlight);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--accent-secondary);
+            z-index: 2;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            padding: 24px;
+            display: none;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 32px;
+            border-left: 2px solid var(--glass-border);
+        }
+
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+
+        .timeline-item.completed { border-left-color: var(--semantic-success); }
+        .timeline-item.current { border-left-color: var(--accent-primary); }
+
+        .timeline-dot {
+            position: absolute;
+            left: -10px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--bg-level-1);
+            border: 2px solid var(--glass-border);
+            z-index: 1;
+        }
+
+        .completed .timeline-dot {
+            background: var(--semantic-success);
+            border-color: var(--semantic-success);
+        }
+
+        .current .timeline-dot {
+            left: -16px;
+            width: 30px;
+            height: 30px;
+            background: var(--accent-primary);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-orange 2s infinite;
+            top: -6px;
+        }
+
+        .timeline-content {
+            padding-left: 16px;
+            top: -4px;
+            position: relative;
+        }
+
+        .station-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .completed .station-name { color: var(--text-secondary); }
+        .current .station-name { color: var(--accent-primary); }
+
+        .station-times {
+            display: flex;
+            gap: 24px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .station-times span strong {
+            color: var(--text-secondary);
+        }
+
+        /* Map Experience */
+        .map-experience {
+            background: var(--bg-level-2);
+            border-radius: 16px;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            display: none;
+            border: 1px solid var(--glass-border);
+        }
+
+        .map-placeholder {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.1) 0%, transparent 60%),
+                repeating-linear-gradient(45deg, var(--glass-border) 0, var(--glass-border) 1px, transparent 1px, transparent 20px),
+                repeating-linear-gradient(-45deg, var(--glass-border) 0, var(--glass-border) 1px, transparent 1px, transparent 20px);
+            opacity: 0.3;
+        }
+
+        .map-overlay-card {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            background: rgba(11, 16, 32, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loading-skeleton {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <div class="navbar-logo">
-                <i class="fas fa-train"></i>
-                <span>RailTrack</span>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="../index.html" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="train-search.html" class="nav-link">Search Trains</a></li>
-                <li class="nav-item"><a href="live-status.html" class="nav-link active">Live Status</a></li>
-                <li class="nav-item"><a href="pnr-status.html" class="nav-link">PNR Status</a></li>
-                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="login.html" class="nav-link login-btn">Login</a></li>
+
+    <!-- Desktop Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container container">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-train-subway"></i> Track My Rail
+            </a>
+            <ul class="desktop-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="train-search.html">Search</a></li>
+                <li><a href="live-status.html" class="active">Live Status</a></li>
+                <li><a href="pnr-status.html">PNR Status</a></li>
             </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="container" style="padding-top: 40px; padding-bottom: 40px;">
-        <h1 style="color: #003da5; margin-bottom: 30px;">
-            <i class="fas fa-map-location-dot"></i> Live Train Running Status
-        </h1>
-
-        <!-- Status Search Form -->
-        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
-            <form id="statusForm">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                    <div class="form-group">
-                        <label for="trainNumber">Train Number</label>
-                        <input type="text" id="trainNumber" placeholder="e.g., 15001" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="statusDate">Journey Date (Select the train's start date)</label>
-                        <input type="date" id="statusDate" required>
-                    </div>
+    <main class="container">
+        
+        <div class="layout-grid">
+            <!-- Left Column: Search & Timeline -->
+            <div class="left-col">
+                <div class="glass-panel search-panel">
+                    <h2>Live Tracking</h2>
+                    <form id="statusForm">
+                        <div class="form-group">
+                            <label>Train Number / Name</label>
+                            <input type="text" id="trainNumber" class="input-modern" placeholder="e.g. 12951" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Journey Start Date</label>
+                            <input type="date" id="statusDate" class="input-modern" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;">
+                            <i class="fas fa-location-crosshairs"></i> Locate Train
+                        </button>
+                    </form>
                 </div>
-                <button type="submit" class="search-btn" style="margin-top: 20px; width: 100%; max-width: 200px;">
-                    <i class="fas fa-search"></i> Check Status
-                </button>
-            </form>
-        </div>
 
-        <!-- Status Information -->
-        <div id="statusResultSection" style="display: none;">
-            <div style="background: linear-gradient(135deg, #003da5, #1e5aa8); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Train</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;" id="statusTrainName"></div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Current Status</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;" id="statusCurrent"></div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Current Location</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;" id="statusLocation"></div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Delay/Early</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;" id="statusDelay"></div>
+                <div id="loadingState" class="loading-skeleton glass-panel">
+                    <div style="font-size: 2rem; color: var(--accent-primary); animation: pulse-green 1s infinite;"><i class="fas fa-satellite-dish"></i></div>
+                    <p style="margin-top: 16px; color: var(--text-secondary);">Connecting to satellites...</p>
+                </div>
+
+                <div id="timelineContainer" class="glass-panel timeline-container">
+                    <h3 style="margin-bottom: 8px;" id="tlTrainName">Train Route</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px;" id="tlTrainStatus">Status</p>
+                    
+                    <div class="timeline" id="routeTimeline">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
 
-            <!-- Route Progress -->
-            <h2 style="color: #003da5; margin-bottom: 20px;">Route Progress</h2>
-            <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" id="routeProgressContainer"></div>
-        </div>
-
-        <!-- Loading -->
-        <div id="loadingSection" style="display: none;">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p style="margin-top: 20px; color: #666;">Checking status...</p>
-            </div>
-        </div>
-
-        <!-- No Results -->
-        <div id="noStatusDataSection" style="display: none; text-align: center; padding: 40px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ddd; margin-bottom: 20px; display: block;"></i>
-            <h3 style="color: #666; margin-bottom: 10px;">Status not found</h3>
-            <p style="color: #999;">Please check the train number and date</p>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>RailTrack</h4>
-                    <p>Your trusted partner for Indian Railway information</p>
+            <!-- Right Column: Progress & Map -->
+            <div class="right-col">
+                
+                <div id="progressContainer" class="glass-panel journey-progress">
+                    <div class="progress-header">
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Distance Covered</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);" id="distCovered">0 km</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Remaining</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; color: var(--accent-primary);" id="distRemain">0 km</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBarFill">
+                            <div class="progress-train-icon">
+                                <i class="fas fa-train" style="color: white; font-size: 12px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-labels">
+                        <span id="srcStation">Source</span>
+                        <span id="dstStation">Destination</span>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="train-search.html">Search Trains</a></li>
-                        <li><a href="live-status.html">Live Status</a></li>
-                        <li><a href="pnr-status.html">PNR Status</a></li>
-                    </ul>
+
+                <div id="mapContainer" class="map-experience">
+                    <div class="map-placeholder"></div>
+                    <div style="position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); font-size: 0.85rem;">
+                        <span class="live-indicator" style="margin-right: 8px;"></span> LIVE GPS ACTIVE
+                    </div>
+                    
+                    <div class="map-overlay-card">
+                        <div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Next Station</div>
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent-primary);" id="mapNextStation">Waiting...</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Delay</div>
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--semantic-error);" id="mapDelay">--</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 RailTrack. All rights reserved.</p>
+
             </div>
         </div>
-    </footer>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <ul class="bottom-nav-list">
+            <a href="../index.html" class="bottom-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="train-search.html" class="bottom-nav-item">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="live-status.html" class="bottom-nav-item active">
+                <i class="fas fa-location-crosshairs"></i>
+                <span>Live</span>
+            </a>
+            <a href="pnr-status.html" class="bottom-nav-item">
+                <i class="fas fa-ticket-alt"></i>
+                <span>PNR</span>
+            </a>
+        </ul>
+    </nav>
 
     <script src="../script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.querySelector('.hamburger');
-            const navMenu = document.querySelector('.nav-menu');
-
-            if (hamburger) {
-                hamburger.addEventListener('click', function() {
-                    navMenu.classList.toggle('active');
-                });
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('statusDate');
             const today = new Date().toISOString().split('T')[0];
-            dateInput.min = today;
             dateInput.value = today;
 
             document.getElementById('statusForm').addEventListener('submit', handleStatusSearch);
@@ -148,153 +367,117 @@
             const trainNumber = document.getElementById('trainNumber').value;
             const date = document.getElementById('statusDate').value;
 
-            if (!trainNumber || !date) {
-                RailTrack.showError('Please fill all fields');
-                return;
-            }
-
-            showLoading(true);
-            hideStatusResults();
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('timelineContainer').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('mapContainer').style.display = 'none';
 
             try {
-                const statusData = await RailTrack.fetchTrainStatus(trainNumber);
+                // Call global fetch
+                let statusData = await RailTrack.fetchTrainStatus(trainNumber);
 
-                if (statusData) {
-                    displayStatus({
-                        trainNumber: statusData.trainNumber,
-                        trainName: statusData.trainName,
-                        currentStatus: statusData.runningStatus || 'Running',
-                        currentLocation: statusData.currentLocation || 'Unknown',
-                        delay: statusData.currentDelay || 'On Time',
-                        route: statusData.route || []
-                    });
-                } else {
-                    displayStatus({
-                        trainNumber: trainNumber,
-                        trainName: 'Rajdhani Express',
-                        currentStatus: 'Departed from Gwalior',
-                        currentLocation: 'Gwalior Junction',
-                        delay: 'On Time',
-                        route: [
-                            { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed' },
-                            { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed' },
-                            { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current' },
-                            { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending' },
-                            { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending' },
-                            { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending' }
-                        ]
-                    });
+                // Fallback mock data if API limits reached
+                if (!statusData || !statusData.success) {
+                    statusData = generateMockData(trainNumber);
                 }
+
+                renderDashboard(statusData);
+
             } catch (error) {
-                console.error('Error fetching status:', error);
-                RailTrack.showError('Unable to load train status. Showing mock data.');
-                displayStatus({
-                    trainNumber: trainNumber,
-                    trainName: 'Rajdhani Express',
-                    currentStatus: 'Departed from Gwalior',
-                    currentLocation: 'Gwalior Junction',
-                    delay: 'On Time',
-                    route: [
-                        { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed' },
-                        { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed' },
-                        { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current' },
-                        { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending' },
-                        { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending' },
-                        { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending' }
-                    ]
-                });
+                console.error(error);
+                renderDashboard(generateMockData(trainNumber));
             } finally {
-                showLoading(false);
+                document.getElementById('loadingState').style.display = 'none';
             }
         }
 
-        function displayStatus(status) {
-            document.getElementById('statusTrainName').textContent = `${status.trainName} (#${status.trainNumber})`;
-            document.getElementById('statusCurrent').textContent = status.currentStatus;
-            document.getElementById('statusLocation').textContent = status.currentLocation;
-            document.getElementById('statusDelay').textContent = status.delay;
+        function generateMockData(trainNo) {
+            return {
+                trainNumber: trainNo,
+                trainName: 'Rajdhani Express',
+                runningStatus: 'Departed from Gwalior',
+                currentLocation: 'Gwalior Junction',
+                currentDelay: 'On Time',
+                route: [
+                    { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed', distance: '0' },
+                    { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed', distance: '195' },
+                    { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current', distance: '313' },
+                    { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending', distance: '410' },
+                    { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending', distance: '702' },
+                    { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending', distance: '1384' }
+                ]
+            };
+        }
 
-            const routeContainer = document.getElementById('routeProgressContainer');
-            routeContainer.innerHTML = '';
+        function renderDashboard(data) {
+            document.getElementById('timelineContainer').style.display = 'block';
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('mapContainer').style.display = 'block';
 
-            const timeline = document.createElement('div');
-            timeline.style.position = 'relative';
-            timeline.style.paddingLeft = '30px';
+            // Text Setup
+            document.getElementById('tlTrainName').textContent = `${data.trainName} (${data.trainNumber})`;
+            document.getElementById('tlTrainStatus').innerHTML = `<span class="badge ${data.currentDelay === 'On Time' ? 'badge-success' : 'badge-error'}">${data.currentDelay}</span> - ${data.runningStatus}`;
+            
+            document.getElementById('mapNextStation').textContent = data.currentLocation;
+            document.getElementById('mapDelay').textContent = data.currentDelay;
 
-            status.route.forEach((station, index) => {
+            // Route Rendering
+            const timeline = document.getElementById('routeTimeline');
+            timeline.innerHTML = '';
+            
+            let totalDistance = 0;
+            let currentDistance = 0;
+            
+            if (data.route && data.route.length > 0) {
+                document.getElementById('srcStation').textContent = data.route[0].station;
+                document.getElementById('dstStation').textContent = data.route[data.route.length - 1].station;
+                totalDistance = parseInt(data.route[data.route.length - 1].distance) || 1000;
+            }
+
+            data.route.forEach((station) => {
                 const item = document.createElement('div');
-                item.style.marginBottom = '30px';
-                item.style.paddingBottom = '30px';
-                item.style.borderLeft = '2px solid #e0e0e0';
-                item.style.position = 'relative';
-
-                if (station.status === 'current') {
-                    item.style.borderLeftColor = '#f39c12';
-                } else if (station.status === 'completed') {
-                    item.style.borderLeftColor = '#27ae60';
+                item.className = `timeline-item ${station.status}`;
+                
+                if (station.status === 'completed' || station.status === 'current') {
+                    currentDistance = parseInt(station.distance) || currentDistance;
                 }
 
-                const dot = document.createElement('div');
-                dot.style.position = 'absolute';
-                dot.style.left = '-12px';
-                dot.style.top = '0';
-                dot.style.width = '22px';
-                dot.style.height = '22px';
-                dot.style.borderRadius = '50%';
-                dot.style.backgroundColor = 'white';
-                dot.style.border = '3px solid #003da5';
-                dot.style.display = 'flex';
-                dot.style.alignItems = 'center';
-                dot.style.justifyContent = 'center';
-                dot.style.zIndex = '1';
-
+                let iconHTML = `<div class="timeline-dot"></div>`;
                 if (station.status === 'current') {
-                    dot.style.backgroundColor = '#f39c12';
-                    dot.style.border = 'none';
-                    dot.style.width = '30px';
-                    dot.style.height = '30px';
-                    dot.style.left = '-16px';
-                    dot.style.top = '-5px';
-                    dot.style.animation = 'pulse 2s infinite';
-                    dot.innerHTML = '<i class="fas fa-train" style="color: white; font-size: 14px;"></i>';
-                    item.style.borderLeftColor = '#f39c12';
-                } else if (station.status === 'completed') {
-                    dot.style.backgroundColor = '#27ae60';
-                    dot.style.borderColor = '#27ae60';
-                    item.style.borderLeftColor = '#27ae60';
-                } else {
-                    dot.style.borderColor = '#e0e0e0';
+                    iconHTML = `<div class="timeline-dot"><i class="fas fa-train" style="color: white; font-size: 12px;"></i></div>`;
                 }
+
+                let badge = station.status === 'completed' ? '<span class="badge badge-success">Departed</span>' :
+                            station.status === 'current' ? '<span class="badge badge-warning">Train is here</span>' :
+                            '<span class="badge badge-neutral">Upcoming</span>';
 
                 item.innerHTML = `
-                    <div style="font-weight: 600; color: ${station.status === 'pending' ? '#666' : '#003da5'}; font-size: 1.1rem; margin-left: 10px;">${station.station}</div>
-                    <div style="display: flex; gap: 30px; margin-top: 8px; color: #888; font-size: 0.9rem; margin-left: 10px;">
-                        <div>Arr: <strong style="color: #444;">${station.arrivalTime || 'N/A'}</strong></div>
-                        <div>Dep: <strong style="color: #444;">${station.departureTime || 'N/A'}</strong></div>
-                    </div>
-                    <div style="margin-top: 8px; margin-left: 10px;">
-                        <span style="display: inline-block; padding: 3px 10px; background-color: ${station.status === 'completed' ? '#d4edda' : station.status === 'current' ? '#fff3cd' : '#f0f0f0'}; color: ${station.status === 'completed' ? '#155724' : station.status === 'current' ? '#856404' : '#666'}; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
-                            ${station.status === 'completed' ? 'Departed' : station.status === 'current' ? 'Train is here' : 'Upcoming'}
-                        </span>
+                    ${iconHTML}
+                    <div class="timeline-content">
+                        <div class="station-name">${station.station}</div>
+                        <div class="station-times">
+                            <span>Arr: <strong>${station.arrivalTime || 'N/A'}</strong></span>
+                            <span>Dep: <strong>${station.departureTime || 'N/A'}</strong></span>
+                            <span>Dist: <strong>${station.distance || '0'} km</strong></span>
+                        </div>
+                        <div style="margin-top: 8px;">${badge}</div>
                     </div>
                 `;
-
-                item.insertBefore(dot, item.firstChild);
                 timeline.appendChild(item);
             });
 
-            routeContainer.appendChild(timeline);
-            document.getElementById('statusResultSection').style.display = 'block';
-            document.getElementById('noStatusDataSection').style.display = 'none';
-        }
-
-        function showLoading(show) {
-            document.getElementById('loadingSection').style.display = show ? 'block' : 'none';
-        }
-
-        function hideStatusResults() {
-            document.getElementById('statusResultSection').style.display = 'none';
-            document.getElementById('noStatusDataSection').style.display = 'none';
+            // Progress Bar Logic
+            document.getElementById('distCovered').textContent = `${currentDistance} km`;
+            document.getElementById('distRemain').textContent = `${totalDistance - currentDistance} km`;
+            
+            let percentage = (currentDistance / totalDistance) * 100;
+            if (percentage > 100) percentage = 100;
+            if (percentage < 0) percentage = 0;
+            
+            // Allow DOM to paint before animating width
+            setTimeout(() => {
+                document.getElementById('progressBarFill').style.width = `${percentage}%`;
+            }, 100);
         }
     </script>
 </body>

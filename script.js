@@ -131,6 +131,14 @@ async function fetchTrainRoute(trainNumber) {
     return null;
 }
 
+async function fetchPNRStatus(pnr) {
+    const response = await apiFetch(`/pnr/${pnr}`);
+    if (response.ok && response.data?.success) {
+        return response.data;
+    }
+    return null;
+}
+
 // Hamburger Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.hamburger');
@@ -459,8 +467,10 @@ window.RailTrack = {
     getAuthHeaders,
     setupAuthNav,
     fetchTrains,
+    searchTrains: fetchTrains,
     fetchTrainStatus,
     fetchTrainRoute,
+    fetchPNRStatus,
     fetchSearchHistory,
     addToSearchHistory,
     getStatusBadge,
