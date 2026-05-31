@@ -360,6 +360,15 @@
             dateInput.value = today;
 
             document.getElementById('statusForm').addEventListener('submit', handleStatusSearch);
+
+            // Handle query params from homepage or search results
+            const urlParams = new URLSearchParams(window.location.search);
+            const train = urlParams.get('train');
+            if(train) {
+                document.getElementById('trainNumber').value = train;
+                // Auto-trigger search
+                document.getElementById('statusForm').dispatchEvent(new Event('submit'));
+            }
         });
 
         async function handleStatusSearch(e) {

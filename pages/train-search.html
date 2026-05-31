@@ -19,6 +19,24 @@
             }
         }
         
+        .filters-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .sort-dropdown {
+            background: var(--bg-level-2);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+        }
+        
         .train-card {
             display: flex;
             flex-direction: column;
@@ -27,12 +45,12 @@
             margin-bottom: 24px;
         }
 
-        @media(min-width: 768px) {
-            .train-card {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
+        .train-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 16px;
         }
 
         .train-info h3 {
@@ -46,25 +64,32 @@
             align-items: center;
             gap: 16px;
             color: var(--text-secondary);
+            margin: 16px 0;
         }
 
         .route-arrow {
             color: var(--glass-border);
             position: relative;
+            flex-grow: 1;
+            max-width: 100px;
         }
 
         .route-arrow::after {
             content: '';
             position: absolute;
             left: 50%; top: 50%;
-            width: 40px; height: 1px;
+            width: 100%; height: 1px;
             background: var(--glass-border);
             transform: translate(-50%, -50%);
             z-index: -1;
         }
 
         .time-box {
-            text-align: center;
+            text-align: left;
+        }
+
+        .time-box.right {
+            text-align: right;
         }
 
         .time-val {
@@ -74,24 +99,81 @@
         }
 
         .time-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-muted);
         }
         
         .train-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            flex-direction: column;
-            width: 100%;
+            margin-top: 16px;
         }
 
         @media(min-width: 768px) {
             .train-actions {
-                width: auto;
+                display: flex;
                 flex-direction: row;
+                gap: 16px;
+                justify-content: flex-end;
             }
+            .train-actions button {
+                width: auto;
+            }
+        }
+
+        .btn-action {
+            background: var(--bg-level-3);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .btn-action.primary {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent-primary);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        .btn-action.primary:hover {
+            background: var(--accent-primary);
+            color: var(--bg-level-1);
+        }
+
+        .days-container {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .day-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .day-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--semantic-success);
         }
 
         .loading-skeleton {
@@ -99,6 +181,28 @@
             padding: 40px;
             text-align: center;
         }
+
+        /* Autocomplete relative to inputs */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: var(--bg-level-3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 8px;
+            display: none;
+        }
+        .ac-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover { background: rgba(0, 229, 255, 0.1); }
     </style>
 </head>
 <body>
@@ -119,25 +223,38 @@
 
     <main class="container">
         
-        <div class="glass-panel" style="padding: 32px; margin-bottom: 40px;">
-            <h1 style="margin-bottom: 24px;">Search Trains</h1>
+        <div class="glass-panel" style="padding: 32px; margin-bottom: 24px;">
+            <h1 style="margin-bottom: 24px;">Find Trains</h1>
             <form id="searchForm" class="search-grid">
                 <div style="position: relative;">
                     <label style="display:block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.9rem;">From Station</label>
                     <input type="text" id="fromStation" class="input-modern" placeholder="e.g. NDLS" required autocomplete="off">
+                    <div class="autocomplete-dropdown" id="fromDropdown"></div>
                 </div>
                 <div style="position: relative;">
                     <label style="display:block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.9rem;">To Station</label>
                     <input type="text" id="toStation" class="input-modern" placeholder="e.g. MMCT" required autocomplete="off">
+                    <div class="autocomplete-dropdown" id="toDropdown"></div>
                 </div>
                 <div>
                     <label style="display:block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.9rem;">Journey Date</label>
                     <input type="date" id="journeyDate" class="input-modern" required>
                 </div>
                 <button type="submit" class="btn-primary" style="height: 52px;">
-                    <i class="fas fa-search"></i> Search
+                    <i class="fas fa-search"></i> Find
                 </button>
             </form>
+        </div>
+
+        <div class="filters-bar" id="filtersBar" style="display: none;">
+            <div style="color: var(--text-secondary); font-size: 0.9rem;"><span id="resultCount">0</span> Trains Found</div>
+            <select id="sortDropdown" class="sort-dropdown">
+                <option value="earliest">Earliest Departure</option>
+                <option value="latest">Latest Departure</option>
+                <option value="fastest">Fastest Train</option>
+                <option value="shortest">Shortest Duration</option>
+                <option value="number">Train Number</option>
+            </select>
         </div>
 
         <div id="loadingState" class="loading-skeleton glass-panel">
@@ -172,6 +289,8 @@
 
     <script src="../script.js"></script>
     <script>
+        let currentTrains = [];
+
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('journeyDate');
             const today = new Date().toISOString().split('T')[0];
@@ -179,67 +298,129 @@
 
             // Handle query params from homepage
             const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q');
-            if(query) {
-                document.getElementById('fromStation').value = query;
+            const from = urlParams.get('from');
+            const to = urlParams.get('to');
+            const date = urlParams.get('date');
+            
+            if(from) document.getElementById('fromStation').value = from;
+            if(to) document.getElementById('toStation').value = to;
+            if(date) document.getElementById('journeyDate').value = date;
+
+            // Setup station autocomplete
+            setupStationAutocomplete('fromStation', 'fromDropdown');
+            setupStationAutocomplete('toStation', 'toDropdown');
+
+            if(from && to) {
+                // Trigger search if params exist
+                executeSearch(from, to, date || today);
             }
 
             document.getElementById('searchForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const from = document.getElementById('fromStation').value.toUpperCase();
-                const to = document.getElementById('toStation').value.toUpperCase();
-                const date = document.getElementById('journeyDate').value;
-                
-                document.getElementById('loadingState').style.display = 'block';
-                document.getElementById('resultsContainer').innerHTML = '';
+                const f = document.getElementById('fromStation').value.toUpperCase();
+                const t = document.getElementById('toStation').value.toUpperCase();
+                const d = document.getElementById('journeyDate').value;
+                executeSearch(f, t, d);
+            });
 
-                try {
-                    let data = await RailTrack.searchTrains(from, to, date);
-                    if (!data || !data.success || !data.trains || data.trains.length === 0) {
-                        data = { trains: generateMockTrains(from, to) };
-                    }
-                    renderTrains(data.trains);
-                } catch (err) {
-                    renderTrains(generateMockTrains(from, to));
-                } finally {
-                    document.getElementById('loadingState').style.display = 'none';
-                }
+            document.getElementById('sortDropdown').addEventListener('change', (e) => {
+                sortAndRenderTrains(e.target.value);
             });
         });
 
-        function generateMockTrains(from, to) {
-            return [
-                {
-                    trainNumber: '12951',
-                    trainName: 'Rajdhani Express',
-                    from: from,
-                    to: to,
-                    departureTime: '16:25',
-                    arrivalTime: '08:15',
-                    duration: '15h 50m',
-                    classes: ['1A', '2A', '3A']
-                },
-                {
-                    trainNumber: '12903',
-                    trainName: 'Golden Temple Mail',
-                    from: from,
-                    to: to,
-                    departureTime: '18:45',
-                    arrivalTime: '11:20',
-                    duration: '16h 35m',
-                    classes: ['SL', '3A', '2A', '1A']
+        function setupStationAutocomplete(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+                const results = window.RailTrack.fuzzySearchStations(val);
+                dropdown.innerHTML = '';
+
+                if (results.length > 0) {
+                    dropdown.style.display = 'block';
+                    results.forEach((s) => {
+                        const div = document.createElement('div');
+                        div.className = 'ac-item';
+                        div.innerHTML = `<div style="font-weight: 600;">${s.name} (${s.code})</div>`;
+                        div.addEventListener('click', () => {
+                            input.value = s.code;
+                            dropdown.style.display = 'none';
+                        });
+                        dropdown.appendChild(div);
+                    });
+                } else {
+                    dropdown.style.display = 'none';
                 }
-            ];
+            });
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
+            });
+        }
+
+        async function executeSearch(from, to, date) {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsContainer').innerHTML = '';
+            document.getElementById('filtersBar').style.display = 'none';
+
+            try {
+                let data = await RailTrack.searchTrains(from, to, date);
+                if (!data || !data.success || !data.trains || data.trains.length === 0) {
+                    // Generate Mock trains if API exhausted
+                    currentTrains = RailTrack.getMockTrains(from, to, date);
+                } else {
+                    currentTrains = data.trains;
+                }
+            } catch (err) {
+                currentTrains = RailTrack.getMockTrains(from, to, date);
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+                const sortPref = document.getElementById('sortDropdown').value;
+                sortAndRenderTrains(sortPref);
+            }
+        }
+
+        function convertToMinutes(timeStr) {
+            if(!timeStr) return 0;
+            const parts = timeStr.split('h');
+            let h = parseInt(parts[0]) || 0;
+            let m = parts[1] ? parseInt(parts[1].replace('m','').trim()) : 0;
+            return (h * 60) + m;
+        }
+
+        function sortAndRenderTrains(sortKey) {
+            let sorted = [...currentTrains];
+            
+            sorted.sort((a, b) => {
+                if (sortKey === 'earliest') {
+                    return a.departureTime.localeCompare(b.departureTime);
+                } else if (sortKey === 'latest') {
+                    return b.departureTime.localeCompare(a.departureTime);
+                } else if (sortKey === 'fastest' || sortKey === 'shortest') {
+                    return convertToMinutes(a.duration) - convertToMinutes(b.duration);
+                } else if (sortKey === 'number') {
+                    return parseInt(a.trainNumber) - parseInt(b.trainNumber);
+                }
+                return 0;
+            });
+
+            renderTrains(sorted);
         }
 
         function renderTrains(trains) {
             const container = document.getElementById('resultsContainer');
-            
+            container.innerHTML = '';
+
+            document.getElementById('resultCount').textContent = trains.length;
+            if (trains.length > 0) {
+                document.getElementById('filtersBar').style.display = 'flex';
+            }
+
             if (trains.length === 0) {
                 container.innerHTML = `
                     <div class="glass-panel" style="padding: 40px; text-align: center;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px;"></i>
-                        <h3 style="color: var(--text-secondary);">No trains found</h3>
+                        <h3 style="color: var(--text-secondary);">No trains found on this route</h3>
                     </div>`;
                 return;
             }
@@ -249,30 +430,47 @@
                 card.className = 'glass-panel train-card';
                 
                 const classesHTML = t.classes ? t.classes.map(c => `<span class="badge badge-neutral">${c}</span>`).join('') : '';
+                const badgeClass = t.status === 'On Time' ? 'badge-success' : 'badge-warning';
+
+                // Render Running Days
+                const daysAll = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+                const trainDays = t.days || 'Mon Tue Wed Thu Fri Sat Sun'; // Mock assumption
+                const daysHTML = daysAll.map(d => {
+                    return `<span class="day-badge ${trainDays.includes(d) ? 'active' : ''}">${d[0]}</span>`;
+                }).join('');
 
                 card.innerHTML = `
-                    <div class="train-info">
-                        <h3>${t.trainName} <span style="color: var(--text-muted); font-weight: 500;">(#${t.trainNumber})</span></h3>
-                        <div style="margin-bottom: 12px;">${classesHTML}</div>
-                        
-                        <div class="train-route">
-                            <div class="time-box">
-                                <div class="time-val">${t.departureTime}</div>
-                                <div class="time-label">${t.from}</div>
+                    <div class="train-header">
+                        <div class="train-info">
+                            <h3>${t.trainName} <span style="color: var(--text-muted); font-weight: 500;">(#${t.trainNumber})</span></h3>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                ${classesHTML}
+                                <span class="badge ${badgeClass}">${t.status || 'Scheduled'}</span>
                             </div>
-                            <div class="route-arrow">
-                                <i class="fas fa-clock" style="background: var(--bg-level-1); padding: 0 8px; z-index: 1;"></i>
-                                <div style="font-size: 0.75rem; text-align: center; margin-top: 4px; color: var(--text-muted);">${t.duration}</div>
-                            </div>
-                            <div class="time-box">
-                                <div class="time-val">${t.arrivalTime}</div>
-                                <div class="time-label">${t.to}</div>
-                            </div>
+                            <div class="days-container">Runs: ${daysHTML}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="train-route">
+                        <div class="time-box">
+                            <div class="time-val">${t.departureTime}</div>
+                            <div class="time-label">${t.from}</div>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-clock" style="background: var(--bg-level-2); padding: 0 8px; z-index: 1; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);"></i>
+                            <div style="font-size: 0.75rem; text-align: center; margin-top: 12px; color: var(--text-muted);">${t.duration}</div>
+                        </div>
+                        <div class="time-box right">
+                            <div class="time-val">${t.arrivalTime}</div>
+                            <div class="time-label">${t.to}</div>
                         </div>
                     </div>
                     
                     <div class="train-actions">
-                        <button class="btn-secondary" onclick="window.location.href='live-status.html'"><i class="fas fa-location-crosshairs"></i> Live Status</button>
+                        <button class="btn-action primary" onclick="window.location.href='live-status.html?train=${t.trainNumber}'"><i class="fas fa-location-crosshairs"></i> Track Train</button>
+                        <button class="btn-action" onclick="window.location.href='live-status.html?train=${t.trainNumber}'"><i class="fas fa-satellite-dish"></i> Live Status</button>
+                        <button class="btn-action"><i class="fas fa-route"></i> View Route</button>
+                        <button class="btn-action"><i class="fas fa-info-circle"></i> Journey Details</button>
                     </div>
                 `;
                 container.appendChild(card);

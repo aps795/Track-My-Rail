@@ -384,17 +384,21 @@ function clearLocalStorage(key) {
     localStorage.removeItem(key);
 }
 
-// Mock Stations Data (Replace with API call in production)
+// Robust Mock Stations Database
 const mockStations = [
     { code: 'NDLS', name: 'New Delhi' },
-    { code: 'MUM', name: 'Mumbai Central' },
+    { code: 'DLI', name: 'Delhi Junction' },
+    { code: 'DEC', name: 'Delhi Cantt' },
+    { code: 'MMCT', name: 'Mumbai Central' },
+    { code: 'CSMT', name: 'Mumbai CSMT' },
+    { code: 'LTT', name: 'Lokmanya Tilak Terminus' },
     { code: 'BCT', name: 'Mumbai Beach' },
     { code: 'BLR', name: 'Bangalore' },
+    { code: 'SBC', name: 'KSR Bengaluru' },
     { code: 'CHE', name: 'Chennai Central' },
+    { code: 'MAS', name: 'MGR Chennai Central' },
     { code: 'CCT', name: 'Cochin' },
     { code: 'HWH', name: 'Howrah' },
-    { code: 'CSMT', name: 'Chhatrapati Shivaji Terminus' },
-    { code: 'DEL', name: 'Delhi' },
     { code: 'AGC', name: 'Agra Cantt' },
     { code: 'GWL', name: 'Gwalior' },
     { code: 'JYP', name: 'Jaipur' },
@@ -408,49 +412,34 @@ const mockStations = [
     { code: 'JSM', name: 'Jamshedpur' }
 ];
 
-// Get Mock Trains (Replace with real API)
+// Robust Mock Trains Master Database
+const mockTrainsMaster = [
+    { trainNumber: '12951', trainName: 'Rajdhani Express', from: 'New Delhi', to: 'Mumbai Central', departureTime: '16:25', arrivalTime: '08:15', duration: '15h 50m', classes: ['1A', '2A', '3A'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' },
+    { trainNumber: '12953', trainName: 'August Kranti Rajdhani', from: 'Mumbai Central', to: 'Hazrat Nizamuddin', departureTime: '17:10', arrivalTime: '09:43', duration: '16h 33m', classes: ['1A', '2A', '3A'], status: 'Delayed', days: 'Mon Tue Wed Thu Fri Sat Sun' },
+    { trainNumber: '12431', trainName: 'Trivandrum Rajdhani', from: 'Trivandrum Central', to: 'Hazrat Nizamuddin', departureTime: '19:15', arrivalTime: '12:40', duration: '41h 25m', classes: ['1A', '2A', '3A'], status: 'On Time', days: 'Tue Thu Fri' },
+    { trainNumber: '12925', trainName: 'Paschim Express', from: 'Bandra Terminus', to: 'Amritsar', departureTime: '11:25', arrivalTime: '19:20', duration: '31h 55m', classes: ['1A', '2A', '3A', 'SL'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' },
+    { trainNumber: '12004', trainName: 'Shatabdi Express', from: 'New Delhi', to: 'Lucknow', departureTime: '06:10', arrivalTime: '12:40', duration: '6h 30m', classes: ['EC', 'CC'], status: 'On Time', days: 'Mon Tue Wed Thu Fri Sat Sun' }
+];
+
+function fuzzySearchTrains(query) {
+    query = query.toLowerCase().trim();
+    if (!query) return [];
+    return mockTrainsMaster.filter(t => 
+        t.trainNumber.includes(query) || t.trainName.toLowerCase().includes(query)
+    ).slice(0, 5); // top 5 suggestions
+}
+
+function fuzzySearchStations(query) {
+    query = query.toLowerCase().trim();
+    if (!query) return [];
+    return mockStations.filter(s => 
+        s.code.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)
+    ).slice(0, 5);
+}
+
+// Get Mock Trains (Fallback)
 function getMockTrains(from, to, date) {
-    return [
-        {
-            trainNumber: '15001',
-            trainName: 'Rajdhani Express',
-            from: from,
-            to: to,
-            departureTime: '18:00',
-            arrivalTime: '06:30',
-            duration: '12h 30m',
-            status: 'On Time',
-            coachAvailability: 500,
-            classes: ['1AC', '2AC', '3AC', 'SL'],
-            date: date
-        },
-        {
-            trainNumber: '15002',
-            trainName: 'Shatabdi Express',
-            from: from,
-            to: to,
-            departureTime: '06:00',
-            arrivalTime: '15:30',
-            duration: '9h 30m',
-            status: 'Delayed',
-            coachAvailability: 150,
-            classes: ['1AC', '2AC'],
-            date: date
-        },
-        {
-            trainNumber: '15003',
-            trainName: 'Garib Rath Express',
-            from: from,
-            to: to,
-            departureTime: '21:00',
-            arrivalTime: '09:00',
-            duration: '12h',
-            status: 'On Time',
-            coachAvailability: 400,
-            classes: ['3AC', 'SL'],
-            date: date
-        }
-    ];
+    return mockTrainsMaster;
 }
 
 // Export functions for use in other pages
@@ -478,5 +467,8 @@ window.RailTrack = {
     getFromLocalStorage,
     clearLocalStorage,
     mockStations,
-    getMockTrains
+    mockTrainsMaster,
+    getMockTrains,
+    fuzzySearchTrains,
+    fuzzySearchStations
 };
