@@ -97,7 +97,7 @@ app.get('/api/stations/search', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/api/v3/searchStation', { query });
+                const data = await fetchFromRapidAPI('/api/v1/searchStation', { query });
                 let stations = [];
                 const rawData = data.data || data || [];
                 if (Array.isArray(rawData)) {
@@ -130,7 +130,7 @@ app.get('/api/trains/search', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/api/v3/getTrainBetweenStations', { 
+                const data = await fetchFromRapidAPI('/api/v3/trainBetweenStations', { 
                     fromStationCode: from, 
                     toStationCode: to, 
                     dateOfJourney: date 
@@ -177,7 +177,7 @@ app.get('/api/trains/:trainNo/route', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/api/v3/getTrainSchedule', { trainNo });
+                const data = await fetchFromRapidAPI('/api/v1/getTrainSchedule', { trainNo });
                 return res.json({
                     success: true,
                     trainNo,
@@ -203,11 +203,17 @@ app.get('/api/trains/:trainNo/status', async (req, res) => {
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/api/v3/getLiveTrainStatus', { trainNo, startDay: '0' });
+                const data = await fetchFromRapidAPI('/api/v1/liveTrainStatus', { trainNo, startDay: '0' });
+                const rawData = data.data || data;
                 return res.json({
                     success: true,
                     trainNo,
-                    data: data.data || data,
+                    trainNumber: rawData.train_number || trainNo,
+                    trainName: rawData.train_name || 'Unknown',
+                    runningStatus: rawData.new_message || 'Running',
+                    currentLocation: rawData.next_station_name || rawData.source_stn_name || 'Unknown',
+                    currentDelay: rawData.delay || 'On Time',
+                    data: rawData,
                     dataSource: 'RAPID_API'
                 });
             } catch (apiError) {

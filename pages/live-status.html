@@ -166,14 +166,7 @@
                         currentStatus: statusData.runningStatus || 'Running',
                         currentLocation: statusData.currentLocation || 'Unknown',
                         delay: statusData.currentDelay || 'On Time',
-                        route: [
-                            { station: 'New Delhi', arrivalTime: '00:00', departureTime: '18:00', status: 'completed' },
-                            { station: 'Agra Cantt', arrivalTime: '21:15', departureTime: '21:30', status: 'completed' },
-                            { station: 'Gwalior', arrivalTime: '23:20', departureTime: '23:35', status: 'current' },
-                            { station: 'Bina Junction', arrivalTime: '01:45', departureTime: '01:50', status: 'pending' },
-                            { station: 'Bhopal', arrivalTime: '04:05', departureTime: '04:20', status: 'pending' },
-                            { station: 'Mumbai Central', arrivalTime: '06:30', departureTime: '', status: 'pending' }
-                        ]
+                        route: statusData.route || []
                     });
                 } else {
                     displayStatus({
@@ -182,14 +175,7 @@
                         currentStatus: 'Running',
                         currentLocation: 'Gwalior Junction',
                         delay: 'On Time',
-                        route: [
-                            { station: 'New Delhi', arrivalTime: '00:00', departureTime: '18:00', status: 'completed' },
-                            { station: 'Agra Cantt', arrivalTime: '21:15', departureTime: '21:30', status: 'completed' },
-                            { station: 'Gwalior', arrivalTime: '23:20', departureTime: '23:35', status: 'current' },
-                            { station: 'Bina Junction', arrivalTime: '01:45', departureTime: '01:50', status: 'pending' },
-                            { station: 'Bhopal', arrivalTime: '04:05', departureTime: '04:20', status: 'pending' },
-                            { station: 'Mumbai Central', arrivalTime: '06:30', departureTime: '', status: 'pending' }
-                        ]
+                        route: []
                     });
                 }
             } catch (error) {
@@ -201,14 +187,7 @@
                     currentStatus: 'Running',
                     currentLocation: 'Gwalior Junction',
                     delay: 'On Time',
-                    route: [
-                        { station: 'New Delhi', arrivalTime: '00:00', departureTime: '18:00', status: 'completed' },
-                        { station: 'Agra Cantt', arrivalTime: '21:15', departureTime: '21:30', status: 'completed' },
-                        { station: 'Gwalior', arrivalTime: '23:20', departureTime: '23:35', status: 'current' },
-                        { station: 'Bina Junction', arrivalTime: '01:45', departureTime: '01:50', status: 'pending' },
-                        { station: 'Bhopal', arrivalTime: '04:05', departureTime: '04:20', status: 'pending' },
-                        { station: 'Mumbai Central', arrivalTime: '06:30', departureTime: '', status: 'pending' }
-                    ]
+                    route: []
                 });
             } finally {
                 showLoading(false);
