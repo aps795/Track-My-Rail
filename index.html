@@ -211,14 +211,17 @@
 
     <nav class="top-nav">
         <div class="nav-container container">
-            <a href="index.html" class="logo">
+            <a href="/track-train" class="logo">
                 <i class="fas fa-train-subway"></i> Track My Rail
             </a>
             <ul class="desktop-menu">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="pages/train-search.html">Search</a></li>
-                <li><a href="pages/live-status.html">Live Status</a></li>
-                <li><a href="pages/pnr-status.html">PNR Status</a></li>
+                <li><a href="/track-train" class="active">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status">Live Status</a></li>
+                <li><a href="/pnr">PNR</a></li>
+                <li><a href="/seat-availability">Seats</a></li>
+                <li><a href="/fare-enquiry">Fare</a></li>
+                <li><a href="/coach-position">Coach</a></li>
             </ul>
         </div>
     </nav>
@@ -302,22 +305,25 @@
 
     <nav class="bottom-nav">
         <ul class="bottom-nav-list">
-            <a href="index.html" class="bottom-nav-item active">
+            <a href="/track-train" class="bottom-nav-item active">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-
-            <a href="pages/train-search.html" class="bottom-nav-item">
+            <a href="/between-stations" class="bottom-nav-item">
                 <i class="fas fa-search"></i>
                 <span>Search</span>
             </a>
-            <a href="pages/live-status.html" class="bottom-nav-item">
+            <a href="/train-status" class="bottom-nav-item">
                 <i class="fas fa-location-crosshairs"></i>
                 <span>Live</span>
             </a>
-            <a href="pages/pnr-status.html" class="bottom-nav-item">
+            <a href="/pnr" class="bottom-nav-item">
                 <i class="fas fa-ticket-alt"></i>
                 <span>PNR</span>
+            </a>
+            <a href="/seat-availability" class="bottom-nav-item">
+                <i class="fas fa-couch"></i>
+                <span>Seats</span>
             </a>
         </ul>
     </nav>
@@ -388,7 +394,7 @@
                                 <div class="ac-secondary"><i class="fas fa-route"></i> ${t.from} &rarr; ${t.to}</div>
                             `;
                             div.addEventListener('click', () => {
-                                window.location.href = `pages/live-status.html?train=${t.trainNumber}`;
+                                window.location.href = `/train-status?train=${t.trainNumber}`;
                             });
                             trackDropdown.appendChild(div);
                         });
@@ -467,14 +473,14 @@
                 const from = document.getElementById('fromInput').value;
                 const to = document.getElementById('toInput').value;
                 const date = document.getElementById('dateInput').value;
-                window.location.href = `pages/train-search.html?from=${from}&to=${to}&date=${date}`;
+                window.location.href = `/between-stations?from=${from}&to=${to}&date=${date}`;
             });
 
             // PNR Form Submission
             document.getElementById('pnrForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const pnr = document.getElementById('pnrInputMain').value;
-                window.location.href = `pages/pnr-status.html?pnr=${pnr}`;
+                window.location.href = `/pnr?pnr=${pnr}`;
             });
             
             // Keyboard navigation for Track Train

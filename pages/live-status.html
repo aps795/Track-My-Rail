@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Train Status | Track My Rail</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .layout-grid {
@@ -228,14 +228,17 @@
     <!-- Desktop Navigation -->
     <nav class="top-nav">
         <div class="nav-container container">
-            <a href="../index.html" class="logo">
+            <a href="/track-train" class="logo">
                 <i class="fas fa-train-subway"></i> Track My Rail
             </a>
             <ul class="desktop-menu">
-                <li><a href="../index.html">Home</a></li>
-                <li><a href="train-search.html">Search</a></li>
-                <li><a href="live-status.html" class="active">Live Status</a></li>
-                <li><a href="pnr-status.html">PNR Status</a></li>
+                <li><a href="/track-train">Home</a></li>
+                <li><a href="/between-stations">Search</a></li>
+                <li><a href="/train-status" class="active">Live Status</a></li>
+                <li><a href="/pnr">PNR</a></li>
+                <li><a href="/seat-availability">Seats</a></li>
+                <li><a href="/fare-enquiry">Fare</a></li>
+                <li><a href="/coach-position">Coach</a></li>
             </ul>
         </div>
     </nav>
@@ -333,26 +336,30 @@
     <!-- Mobile Bottom Navigation -->
     <nav class="bottom-nav">
         <ul class="bottom-nav-list">
-            <a href="../index.html" class="bottom-nav-item">
+            <a href="/track-train" class="bottom-nav-item">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="train-search.html" class="bottom-nav-item">
+            <a href="/between-stations" class="bottom-nav-item">
                 <i class="fas fa-search"></i>
                 <span>Search</span>
             </a>
-            <a href="live-status.html" class="bottom-nav-item active">
+            <a href="/train-status" class="bottom-nav-item active">
                 <i class="fas fa-location-crosshairs"></i>
                 <span>Live</span>
             </a>
-            <a href="pnr-status.html" class="bottom-nav-item">
+            <a href="/pnr" class="bottom-nav-item">
                 <i class="fas fa-ticket-alt"></i>
                 <span>PNR</span>
+            </a>
+            <a href="/seat-availability" class="bottom-nav-item">
+                <i class="fas fa-couch"></i>
+                <span>Seats</span>
             </a>
         </ul>
     </nav>
 
-    <script src="../script.js"></script>
+    <script src="/script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('statusDate');

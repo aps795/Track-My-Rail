@@ -6,6 +6,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -351,6 +352,51 @@ app.get('/api/fare-enquiry', async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
+});
+
+// ============================================
+// Clean Routing for Frontend HTML Pages
+// ============================================
+
+// Static file delivery for scripts, styles, datasets
+app.use('/data', express.static(path.join(__dirname, 'data')));
+app.use('/pages', express.static(path.join(__dirname, 'pages')));
+app.use(express.static(path.join(__dirname)));
+
+app.get('/track-train', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/train-status', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'live-status.html'));
+});
+
+app.get('/route', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'train-details.html'));
+});
+
+app.get('/between-stations', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'train-search.html'));
+});
+
+app.get('/pnr', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'pnr-status.html'));
+});
+
+app.get('/seat-availability', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'seat-availability.html'));
+});
+
+app.get('/fare-enquiry', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'fare-enquiry.html'));
+});
+
+app.get('/train-details', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'train-details.html'));
+});
+
+app.get('/coach-position', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'coach-position.html'));
 });
 
 // Global error handler

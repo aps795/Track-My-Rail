@@ -6,6 +6,15 @@
     {
       "source": "/api/(.*)",
       "destination": "https://track-my-rail.onrender.com/api/$1"
-    }
+    },
+    { "source": "/track-train", "destination": "/index.html" },
+    { "source": "/train-status", "destination": "/pages/live-status.html" },
+    { "source": "/route", "destination": "/pages/train-details.html" },
+    { "source": "/between-stations", "destination": "/pages/train-search.html" },
+    { "source": "/pnr", "destination": "/pages/pnr-status.html" },
+    { "source": "/seat-availability", "destination": "/pages/seat-availability.html" },
+    { "source": "/fare-enquiry", "destination": "/pages/fare-enquiry.html" },
+    { "source": "/train-details", "destination": "/pages/train-details.html" },
+    { "source": "/coach-position", "destination": "/pages/coach-position.html" }
   ]
 }
