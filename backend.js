@@ -194,26 +194,71 @@ app.get('/api/trains/:trainNo/route', async (req, res) => {
     }
 });
 
-/**
- * Get Live Train Status
- */
 app.get('/api/trains/:trainNo/status', async (req, res) => {
     try {
         const { trainNo } = req.params;
 
         if (RAILWAY_API_OPTIONS.API_SOURCE === 'RAPID_API') {
             try {
-                const data = await fetchFromRapidAPI('/api/v1/liveTrainStatus', { trainNo, startDay: '0' });
-                const rawData = data.data || data;
+                const [liveData, scheduleData] = await Promise.all([
+                    fetchFromRapidAPI('/api/v1/liveTrainStatus', { trainNo, startDay: '0' }).catch(() => null),
+                    fetchFromRapidAPI('/api/v1/getTrainSchedule', { trainNo }).catch(() => null)
+                ]);
+
+                if (!liveData && !scheduleData) throw new Error('Both APIs failed');
+
+                const rawLiveData = liveData ? (liveData.data || liveData) : {};
+                const rawScheduleData = scheduleData ? (scheduleData.data || scheduleData) : {};
+
+                let mappedRoute = [];
+                let foundCurrent = false;
+                const currentStationCode = rawLiveData.next_station_code || rawLiveData.source || '';
+
+                if (rawScheduleData.route && Array.isArray(rawScheduleData.route)) {
+                    mappedRoute = rawScheduleData.route.map(station => {
+                        let status = 'pending';
+                        if (!foundCurrent) {
+                            if (station.station_code === currentStationCode) {
+                                status = 'current';
+                                foundCurrent = true;
+                            } else {
+                                status = 'completed';
+                            }
+                        }
+
+                        const formatTime = (minutes) => {
+                            if (minutes === undefined || minutes === null) return 'N/A';
+                            const h = Math.floor(minutes / 60).toString().padStart(2, '0');
+                            const m = (minutes % 60).toString().padStart(2, '0');
+                            return `${h}:${m}`;
+                        };
+
+                        return {
+                            station: station.station_name || station.station_code,
+                            arrivalTime: formatTime(station.sta),
+                            departureTime: formatTime(station.std_min || station.std || station.sta),
+                            status: status,
+                            distance: station.distance_from_source || '0'
+                        };
+                    });
+                }
+
+                // If current station not found in route, default all previous to completed (fallback)
+                if (!foundCurrent && mappedRoute.length > 0 && currentStationCode) {
+                    mappedRoute.forEach(s => s.status = 'completed');
+                    mappedRoute[mappedRoute.length - 1].status = 'current';
+                }
+
                 return res.json({
                     success: true,
                     trainNo,
-                    trainNumber: rawData.train_number || trainNo,
-                    trainName: rawData.train_name || 'Unknown',
-                    runningStatus: rawData.new_message || 'Running',
-                    currentLocation: rawData.next_station_name || rawData.source_stn_name || 'Unknown',
-                    currentDelay: rawData.delay || 'On Time',
-                    data: rawData,
+                    trainNumber: rawLiveData.train_number || trainNo,
+                    trainName: rawLiveData.train_name || rawScheduleData.train_name || 'Unknown',
+                    runningStatus: rawLiveData.new_message || 'Running',
+                    currentLocation: rawLiveData.next_station_name || rawLiveData.source_stn_name || 'Unknown',
+                    currentDelay: rawLiveData.delay || 'On Time',
+                    route: mappedRoute,
+                    data: rawLiveData,
                     dataSource: 'RAPID_API'
                 });
             } catch (apiError) {

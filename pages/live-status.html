@@ -46,7 +46,7 @@
                         <input type="text" id="trainNumber" placeholder="e.g., 15001" required>
                     </div>
                     <div class="form-group">
-                        <label for="statusDate">Date</label>
+                        <label for="statusDate">Journey Date (Select the train's start date)</label>
                         <input type="date" id="statusDate" required>
                     </div>
                 </div>
@@ -172,10 +172,17 @@
                     displayStatus({
                         trainNumber: trainNumber,
                         trainName: 'Rajdhani Express',
-                        currentStatus: 'Running',
+                        currentStatus: 'Departed from Gwalior',
                         currentLocation: 'Gwalior Junction',
                         delay: 'On Time',
-                        route: []
+                        route: [
+                            { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed' },
+                            { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed' },
+                            { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current' },
+                            { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending' },
+                            { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending' },
+                            { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending' }
+                        ]
                     });
                 }
             } catch (error) {
@@ -184,10 +191,17 @@
                 displayStatus({
                     trainNumber: trainNumber,
                     trainName: 'Rajdhani Express',
-                    currentStatus: 'Running',
+                    currentStatus: 'Departed from Gwalior',
                     currentLocation: 'Gwalior Junction',
                     delay: 'On Time',
-                    route: []
+                    route: [
+                        { station: 'New Delhi', arrivalTime: '16:00', departureTime: '16:15', status: 'completed' },
+                        { station: 'Agra Cantt', arrivalTime: '18:50', departureTime: '18:55', status: 'completed' },
+                        { station: 'Gwalior Junction', arrivalTime: '20:30', departureTime: '20:35', status: 'current' },
+                        { station: 'VGL Jhansi', arrivalTime: '21:50', departureTime: '21:55', status: 'pending' },
+                        { station: 'Bhopal', arrivalTime: '01:05', departureTime: '01:15', status: 'pending' },
+                        { station: 'Mumbai Central', arrivalTime: '10:05', departureTime: 'N/A', status: 'pending' }
+                    ]
                 });
             } finally {
                 showLoading(false);
@@ -222,30 +236,45 @@
 
                 const dot = document.createElement('div');
                 dot.style.position = 'absolute';
-                dot.style.left = '-8px';
+                dot.style.left = '-12px';
                 dot.style.top = '0';
-                dot.style.width = '14px';
-                dot.style.height = '14px';
+                dot.style.width = '22px';
+                dot.style.height = '22px';
                 dot.style.borderRadius = '50%';
                 dot.style.backgroundColor = 'white';
                 dot.style.border = '3px solid #003da5';
+                dot.style.display = 'flex';
+                dot.style.alignItems = 'center';
+                dot.style.justifyContent = 'center';
+                dot.style.zIndex = '1';
 
                 if (station.status === 'current') {
                     dot.style.backgroundColor = '#f39c12';
+                    dot.style.border = 'none';
+                    dot.style.width = '30px';
+                    dot.style.height = '30px';
+                    dot.style.left = '-16px';
+                    dot.style.top = '-5px';
                     dot.style.animation = 'pulse 2s infinite';
+                    dot.innerHTML = '<i class="fas fa-train" style="color: white; font-size: 14px;"></i>';
+                    item.style.borderLeftColor = '#f39c12';
                 } else if (station.status === 'completed') {
                     dot.style.backgroundColor = '#27ae60';
+                    dot.style.borderColor = '#27ae60';
+                    item.style.borderLeftColor = '#27ae60';
+                } else {
+                    dot.style.borderColor = '#e0e0e0';
                 }
 
                 item.innerHTML = `
-                    <div style="font-weight: 600; color: #003da5; font-size: 1.1rem;">${station.station}</div>
-                    <div style="display: flex; gap: 30px; margin-top: 8px; color: #666; font-size: 0.9rem;">
-                        <div>Arrival: ${station.arrivalTime || 'N/A'}</div>
-                        <div>Departure: ${station.departureTime || 'N/A'}</div>
+                    <div style="font-weight: 600; color: ${station.status === 'pending' ? '#666' : '#003da5'}; font-size: 1.1rem; margin-left: 10px;">${station.station}</div>
+                    <div style="display: flex; gap: 30px; margin-top: 8px; color: #888; font-size: 0.9rem; margin-left: 10px;">
+                        <div>Arr: <strong style="color: #444;">${station.arrivalTime || 'N/A'}</strong></div>
+                        <div>Dep: <strong style="color: #444;">${station.departureTime || 'N/A'}</strong></div>
                     </div>
-                    <div style="margin-top: 8px;">
-                        <span style="display: inline-block; padding: 3px 10px; background-color: ${station.status === 'completed' ? '#d4edda' : station.status === 'current' ? '#fff3cd' : '#f0f0f0'}; color: ${station.status === 'completed' ? '#155724' : station.status === 'current' ? '#856404' : '#666'}; border-radius: 3px; font-size: 0.8rem;">
-                            ${station.status === 'completed' ? 'Completed' : station.status === 'current' ? 'Current' : 'Pending'}
+                    <div style="margin-top: 8px; margin-left: 10px;">
+                        <span style="display: inline-block; padding: 3px 10px; background-color: ${station.status === 'completed' ? '#d4edda' : station.status === 'current' ? '#fff3cd' : '#f0f0f0'}; color: ${station.status === 'completed' ? '#155724' : station.status === 'current' ? '#856404' : '#666'}; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
+                            ${station.status === 'completed' ? 'Departed' : station.status === 'current' ? 'Train is here' : 'Upcoming'}
                         </span>
                     </div>
                 `;
