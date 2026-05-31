@@ -96,6 +96,9 @@ async function fetchTrains(from, to, date, classType = '') {
     try {
         const response = await apiFetch(`/trains/search?${query.toString()}`);
         if (response.ok && response.data?.success) {
+            if (response.data.dataSource === 'MOCK_DATA') {
+                throw new Error('API_LIMIT_EXCEEDED');
+            }
             if (response.data.trains && response.data.trains.length > 0) {
                 console.log('Real-time trains loaded from API');
                 return response.data.trains;
@@ -105,11 +108,11 @@ async function fetchTrains(from, to, date, classType = '') {
             }
         } else {
             console.error('API Search Error:', response.data?.message || 'Unknown error');
-            return [];
+            throw new Error('API_ERROR');
         }
     } catch (err) {
         console.error('Failed to connect to backend:', err.message);
-        return [];
+        throw err;
     }
 }
 
@@ -386,33 +389,39 @@ function clearLocalStorage(key) {
 // Async Live Search Functions
 async function fuzzySearchTrains(query) {
     query = query.toLowerCase().trim();
-    if (!query || query.length < 2) return [];
+    if (!query || query.length < 2) return null; // Return null instead of [] for errors
     
     try {
         const response = await apiFetch(`/trains/autocomplete?query=${encodeURIComponent(query)}`);
         if (response.ok && response.data?.success) {
+            if (response.data.dataSource === 'MOCK_DATA') {
+                throw new Error('API_LIMIT_EXCEEDED');
+            }
             return response.data.trains || [];
         }
-        return [];
+        throw new Error('API_ERROR');
     } catch (err) {
         console.error('Train autocomplete error:', err);
-        return [];
+        throw err;
     }
 }
 
 async function fuzzySearchStations(query) {
     query = query.toLowerCase().trim();
-    if (!query || query.length < 2) return [];
+    if (!query || query.length < 2) return null;
     
     try {
         const response = await apiFetch(`/stations/search?query=${encodeURIComponent(query)}`);
         if (response.ok && response.data?.success) {
+            if (response.data.dataSource === 'MOCK_DATA') {
+                throw new Error('API_LIMIT_EXCEEDED');
+            }
             return response.data.stations || [];
         }
-        return [];
+        throw new Error('API_ERROR');
     } catch (err) {
         console.error('Station autocomplete error:', err);
-        return [];
+        throw err;
     }
 }
 

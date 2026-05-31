@@ -354,22 +354,31 @@
                 dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
                 dropdown.style.display = 'block';
 
-                const results = await window.RailTrack.fuzzySearchStations(val);
-                dropdown.innerHTML = '';
+                try {
+                    const results = await window.RailTrack.fuzzySearchStations(val);
+                    if (results === null) return;
+                    dropdown.innerHTML = '';
 
-                if (results.length > 0) {
-                    results.forEach((s) => {
-                        const div = document.createElement('div');
-                        div.className = 'ac-item';
-                        div.innerHTML = `<div style="font-weight: 600;">${s.name} (${s.code})</div>`;
-                        div.addEventListener('click', () => {
-                            input.value = s.code;
-                            dropdown.style.display = 'none';
+                    if (results.length > 0) {
+                        results.forEach((s) => {
+                            const div = document.createElement('div');
+                            div.className = 'ac-item';
+                            div.innerHTML = `<div style="font-weight: 600;">${s.name} (${s.code})</div>`;
+                            div.addEventListener('click', () => {
+                                input.value = s.code;
+                                dropdown.style.display = 'none';
+                            });
+                            dropdown.appendChild(div);
                         });
-                        dropdown.appendChild(div);
-                    });
-                } else {
-                    dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
+                    } else {
+                        dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
+                    }
+                } catch (err) {
+                    if (err.message === 'API_LIMIT_EXCEEDED') {
+                        dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> API Rate Limit Exceeded</div>';
+                    } else {
+                        dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> Service Unavailable</div>';
+                    }
                 }
             }, 300));
             document.addEventListener('click', (e) => {
@@ -384,18 +393,33 @@
 
             try {
                 let data = await RailTrack.searchTrains(from, to, date);
-                if (!data || !data.success || !data.trains || data.trains.length === 0) {
+                if (!data || data.length === 0) {
                     currentTrains = [];
+                    // It will show No Train Found normally
                 } else {
-                    currentTrains = data.trains;
+                    currentTrains = data;
                 }
             } catch (err) {
                 console.error("Search failed:", err);
                 currentTrains = [];
+                // We could render a specific error card here if we want, but for now we'll set a flag
+                window.API_ERROR = err.message;
             } finally {
                 document.getElementById('loadingState').style.display = 'none';
                 const sortPref = document.getElementById('sortDropdown').value;
-                sortAndRenderTrains(sortPref);
+                if (window.API_ERROR) {
+                    document.getElementById('resultsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-exclamation-triangle" style="color: var(--accent-secondary)"></i></div>
+                            <h3>Service Unavailable</h3>
+                            <p>${window.API_ERROR === 'API_LIMIT_EXCEEDED' ? 'The IRCTC API rate limit has been exceeded.' : 'We could not connect to the railway database.'}</p>
+                            <button class="btn-primary" onclick="window.history.back()" style="margin-top:20px;">Go Back</button>
+                        </div>
+                    `;
+                    window.API_ERROR = null;
+                } else {
+                    sortAndRenderTrains(sortPref);
+                }
             }
         }
 

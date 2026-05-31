@@ -372,25 +372,34 @@
                 trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
                 trackDropdown.style.display = 'block';
 
-                const results = await window.RailTrack.fuzzySearchTrains(val);
-                trackDropdown.innerHTML = '';
-                trackActiveIndex = -1;
+                try {
+                    const results = await window.RailTrack.fuzzySearchTrains(val);
+                    if (results === null) return;
+                    trackDropdown.innerHTML = '';
+                    trackActiveIndex = -1;
 
-                if (results.length > 0) {
-                    results.forEach((t, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'ac-item';
-                        div.innerHTML = `
-                            <div class="ac-primary">${t.trainNumber} - ${t.trainName}</div>
-                            <div class="ac-secondary"><i class="fas fa-route"></i> ${t.from} &rarr; ${t.to}</div>
-                        `;
-                        div.addEventListener('click', () => {
-                            window.location.href = `pages/live-status.html?train=${t.trainNumber}`;
+                    if (results.length > 0) {
+                        results.forEach((t, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'ac-item';
+                            div.innerHTML = `
+                                <div class="ac-primary">${t.trainNumber} - ${t.trainName}</div>
+                                <div class="ac-secondary"><i class="fas fa-route"></i> ${t.from} &rarr; ${t.to}</div>
+                            `;
+                            div.addEventListener('click', () => {
+                                window.location.href = `pages/live-status.html?train=${t.trainNumber}`;
+                            });
+                            trackDropdown.appendChild(div);
                         });
-                        trackDropdown.appendChild(div);
-                    });
-                } else {
-                    trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No trains found</div>';
+                    } else {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No trains found</div>';
+                    }
+                } catch (err) {
+                    if (err.message === 'API_LIMIT_EXCEEDED') {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> API Rate Limit Exceeded</div>';
+                    } else {
+                        trackDropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> Service Unavailable</div>';
+                    }
                 }
             }, 300));
 
@@ -410,24 +419,33 @@
                     dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
                     dropdown.style.display = 'block';
 
-                    const results = await window.RailTrack.fuzzySearchStations(val);
-                    dropdown.innerHTML = '';
+                    try {
+                        const results = await window.RailTrack.fuzzySearchStations(val);
+                        if (results === null) return;
+                        dropdown.innerHTML = '';
 
-                    if (results.length > 0) {
-                        results.forEach((s) => {
-                            const div = document.createElement('div');
-                            div.className = 'ac-item';
-                            div.innerHTML = `
-                                <div class="ac-primary">${s.name} (${s.code})</div>
-                            `;
-                            div.addEventListener('click', () => {
-                                input.value = s.code;
-                                dropdown.style.display = 'none';
+                        if (results.length > 0) {
+                            results.forEach((s) => {
+                                const div = document.createElement('div');
+                                div.className = 'ac-item';
+                                div.innerHTML = `
+                                    <div class="ac-primary">${s.name} (${s.code})</div>
+                                `;
+                                div.addEventListener('click', () => {
+                                    input.value = s.code;
+                                    dropdown.style.display = 'none';
+                                });
+                                dropdown.appendChild(div);
                             });
-                            dropdown.appendChild(div);
-                        });
-                    } else {
-                        dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
+                        } else {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--text-muted);">No stations found</div>';
+                        }
+                    } catch (err) {
+                        if (err.message === 'API_LIMIT_EXCEEDED') {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> API Rate Limit Exceeded</div>';
+                        } else {
+                            dropdown.innerHTML = '<div class="ac-item" style="color: var(--accent-secondary);"><i class="fas fa-exclamation-triangle"></i> Service Unavailable</div>';
+                        }
                     }
                 }, 300));
 
